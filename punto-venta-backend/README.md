@@ -11,7 +11,7 @@ API REST para sistema de Punto de Venta. Node.js + Fastify + PostgreSQL.
 
 ```bash
 npm install
-cp .env.example .env   # editar con tus credenciales
+cp .env.example .env 
 ```
 
 ## Comandos
