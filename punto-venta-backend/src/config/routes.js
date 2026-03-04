@@ -5,6 +5,7 @@ const healthRoutes = require('../modules/health/health.routes');
 const ticketRoutes = require('../modules/sales/tickets.routes');
 const productRoutes = require('../modules/products/products.routes');
 const barcodeRoutes = require('../modules/products/barcodes.routes');
+const inventoryRoutes = require('../modules/inventory/inventory.routes');
 
 async function registerRoutes(fastify) {
   fastify.register(authRoutes, { prefix: '/auth' });
@@ -12,6 +13,7 @@ async function registerRoutes(fastify) {
   fastify.register(ticketRoutes, { prefix: '/tickets' });
   fastify.register(productRoutes, { prefix: '/products' });
   fastify.register(barcodeRoutes, { prefix: '/barcodes' });
+  fastify.register(inventoryRoutes, { prefix: '/inventory' });
 }
 
 module.exports = registerRoutes;
