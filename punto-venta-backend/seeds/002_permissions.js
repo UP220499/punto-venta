@@ -26,6 +26,8 @@ exports.seed = async function (knex) {
     { code: 'REPORT_READ',           descripcion: 'Ver todos los reportes' },
     // Settings
     { code: 'SETTINGS_MANAGE',       descripcion: 'Administrar configuración del negocio' },
+    { code: 'SETTINGS_READ',         descripcion: 'Ver configuración del negocio' },
+    { code: 'SETTINGS_WRITE',        descripcion: 'Editar configuración del negocio' },
     // Users
     { code: 'USER_CREATE',           descripcion: 'Crear usuarios' },
     { code: 'USER_READ',             descripcion: 'Ver usuarios' },
