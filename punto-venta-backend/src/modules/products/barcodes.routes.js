@@ -1,6 +1,7 @@
 'use strict';
 
 const service = require('./products.service');
+const { requirePermission } = require('../../shared/permissions');
 
 async function barcodeRoutes(fastify) {
   // Auth required – skip OPTIONS for CORS preflight
@@ -9,8 +10,8 @@ async function barcodeRoutes(fastify) {
     await fastify.authenticate(request, reply);
   });
 
-  // GET /barcodes/:barcode_value
-  fastify.get('/:barcode_value', async function (request, reply) {
+  // GET /barcodes/:barcode_value — PRODUCT_READ
+  fastify.get('/:barcode_value', { preHandler: [requirePermission('PRODUCT_READ')] }, async function (request, reply) {
     const { barcode_value } = request.params;
     if (!barcode_value || !barcode_value.trim()) {
       return reply.code(400).send({ error: { code: 'VALIDATION_ERROR', message: 'barcode_value is required' } });

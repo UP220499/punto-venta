@@ -8,6 +8,7 @@ const {
   createBarcodeBody,
 } = require('./products.schemas');
 const service = require('./products.service');
+const { requirePermission } = require('../../shared/permissions');
 
 async function productRoutes(fastify) {
   // Auth required – skip OPTIONS for CORS preflight
@@ -16,24 +17,24 @@ async function productRoutes(fastify) {
     await fastify.authenticate(request, reply);
   });
 
-  // GET /products
-  fastify.get('/', async function (request, reply) {
+  // GET /products — PRODUCT_READ
+  fastify.get('/', { preHandler: [requirePermission('PRODUCT_READ')] }, async function (request, reply) {
     const query = parse(listProductsQuery, request.query);
     const { business_id } = request.user;
     const result = await service.listProducts(business_id, query);
     return reply.send(result);
   });
 
-  // POST /products
-  fastify.post('/', async function (request, reply) {
+  // POST /products — PRODUCT_WRITE
+  fastify.post('/', { preHandler: [requirePermission('PRODUCT_WRITE')] }, async function (request, reply) {
     const data = parse(createProductBody, request.body);
     const { business_id, sub: userId } = request.user;
     const result = await service.createProduct(business_id, userId, data);
     return reply.code(201).send(result);
   });
 
-  // PATCH /products/:product_id
-  fastify.patch('/:product_id', async function (request, reply) {
+  // PATCH /products/:product_id — PRODUCT_WRITE
+  fastify.patch('/:product_id', { preHandler: [requirePermission('PRODUCT_WRITE')] }, async function (request, reply) {
     const productId = Number(request.params.product_id);
     if (!Number.isInteger(productId) || productId <= 0) {
       return reply.code(400).send({ error: { code: 'INVALID_PRODUCT_ID', message: 'product_id must be a positive integer' } });
@@ -47,8 +48,8 @@ async function productRoutes(fastify) {
     return reply.send(result);
   });
 
-  // POST /products/:product_id/barcodes
-  fastify.post('/:product_id/barcodes', async function (request, reply) {
+  // POST /products/:product_id/barcodes — PRODUCT_WRITE
+  fastify.post('/:product_id/barcodes', { preHandler: [requirePermission('PRODUCT_WRITE')] }, async function (request, reply) {
     const productId = Number(request.params.product_id);
     if (!Number.isInteger(productId) || productId <= 0) {
       return reply.code(400).send({ error: { code: 'INVALID_PRODUCT_ID', message: 'product_id must be a positive integer' } });
@@ -59,8 +60,8 @@ async function productRoutes(fastify) {
     return reply.code(201).send(result);
   });
 
-  // DELETE /products/:product_id/barcodes/:barcode_id
-  fastify.delete('/:product_id/barcodes/:barcode_id', async function (request, reply) {
+  // DELETE /products/:product_id/barcodes/:barcode_id — PRODUCT_WRITE
+  fastify.delete('/:product_id/barcodes/:barcode_id', { preHandler: [requirePermission('PRODUCT_WRITE')] }, async function (request, reply) {
     const productId = Number(request.params.product_id);
     const barcodeId = Number(request.params.barcode_id);
     if (!Number.isInteger(productId) || productId <= 0) {
