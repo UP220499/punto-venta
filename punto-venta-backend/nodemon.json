@@ -1,0 +1,17 @@
+{
+  "watch": ["src"],
+  "ext": "js,json",
+  "ignore": [
+    "**/*.log",
+    "server.log",
+    "ticket.pdf",
+    "login.json",
+    "pay.json",
+    "body.json",
+    "cajero.json",
+    ".env",
+    ".env.*",
+    "node_modules"
+  ],
+  "exec": "node src/app.js"
+}

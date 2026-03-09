@@ -4,7 +4,7 @@
   "description": "",
   "main": "src/app.js",
   "scripts": {
-    "dev": "nodemon src/app.js",
+    "dev": "nodemon",
     "start": "node src/app.js",
     "knex": "knex --knexfile knexfile.js",
     "migrate:latest": "knex migrate:latest --knexfile knexfile.js",
