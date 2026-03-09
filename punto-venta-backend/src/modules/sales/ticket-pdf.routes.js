@@ -10,10 +10,10 @@ async function ticketPdfRoutes(fastify) {
     await fastify.authenticate(request, reply);
   });
 
-  // GET /tickets/:ticket_id/print/pdf
+  // GET /tickets/:ticket_id/print/pdf — SALE_VIEW (print is a read/query operation)
   fastify.get(
     '/:ticket_id/print/pdf',
-    { preHandler: [requirePermission('SALE_CREATE')] },
+    { preHandler: [requirePermission('SALE_VIEW')] },
     async function (request, reply) {
       const ticketId = Number(request.params.ticket_id);
       if (!Number.isInteger(ticketId) || ticketId <= 0) {

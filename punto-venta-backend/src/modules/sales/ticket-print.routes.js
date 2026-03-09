@@ -10,11 +10,10 @@ async function ticketPrintRoutes(fastify) {
     await fastify.authenticate(request, reply);
   });
 
-  // GET /tickets/:ticket_id/print/html
-  // SALE_CREATE is chosen so that cajeros (who create and close tickets) can print.
+  // GET /tickets/:ticket_id/print/html — SALE_VIEW (print is a read/query operation)
   fastify.get(
     '/:ticket_id/print/html',
-    { preHandler: [requirePermission('SALE_CREATE')] },
+    { preHandler: [requirePermission('SALE_VIEW')] },
     async function (request, reply) {
       const ticketId = Number(request.params.ticket_id);
       if (!Number.isInteger(ticketId) || ticketId <= 0) {

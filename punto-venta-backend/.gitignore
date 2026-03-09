@@ -8,3 +8,8 @@ dist/
 coverage/
 .claude
 body.json
+login.json
+pay.json
+ticket.pdf
+body.json
+

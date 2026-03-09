@@ -5,6 +5,7 @@ const healthRoutes = require('../modules/health/health.routes');
 const ticketRoutes = require('../modules/sales/tickets.routes');
 const ticketPrintRoutes = require('../modules/sales/ticket-print.routes');
 const ticketPdfRoutes = require('../modules/sales/ticket-pdf.routes');
+const ticketsQueryRoutes = require('../modules/sales/tickets-query.routes');
 const productRoutes = require('../modules/products/products.routes');
 const barcodeRoutes = require('../modules/products/barcodes.routes');
 const inventoryRoutes = require('../modules/inventory/inventory.routes');
@@ -17,6 +18,7 @@ async function registerRoutes(fastify) {
   fastify.register(ticketRoutes, { prefix: '/tickets' });
   fastify.register(ticketPrintRoutes, { prefix: '/tickets' });
   fastify.register(ticketPdfRoutes, { prefix: '/tickets' });
+  fastify.register(ticketsQueryRoutes, { prefix: '/tickets' });
   fastify.register(productRoutes, { prefix: '/products' });
   fastify.register(barcodeRoutes, { prefix: '/barcodes' });
   fastify.register(inventoryRoutes, { prefix: '/inventory' });
