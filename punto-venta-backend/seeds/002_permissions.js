@@ -33,6 +33,8 @@ exports.seed = async function (knex) {
     { code: 'USER_READ',             descripcion: 'Ver usuarios' },
     { code: 'USER_UPDATE',           descripcion: 'Editar usuarios' },
     { code: 'USER_DELETE',           descripcion: 'Eliminar usuarios' },
+    // Audit
+    { code: 'AUDIT_READ',            descripcion: 'Ver log de auditoría' },
   ];
 
   await knex('permission').insert(permissions).onConflict('code').ignore();
