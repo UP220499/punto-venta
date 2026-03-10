@@ -17,7 +17,21 @@ const setErrorHandler = require('./shared/error-handler');
 
 async function start() {
   await registerPlugins(fastify);
+
   await registerRoutes(fastify);
+
+  fastify.setNotFoundHandler(async function (request, reply) {
+    if (request.method === 'OPTIONS') {
+      return reply.code(204).send();
+    }
+
+    return reply.code(404).send({
+      message: `Route ${request.method}:${request.url} not found`,
+      error: 'Not Found',
+      statusCode: 404,
+    });
+  });
+
   setErrorHandler(fastify);
 
   const port = Number(process.env.PORT) || 3000;
