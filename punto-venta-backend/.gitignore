@@ -12,4 +12,8 @@ login.json
 pay.json
 cajero.json
 ticket.pdf
+.postman
 
+# Generated files
+*.pdf
+tmp/
