@@ -86,12 +86,7 @@ async function createTicket(businessId, userId, items) {
 /* ────────────────────── POST /tickets/:id/close ────────────────────── */
 
 async function closeTicket(businessId, userId, ticketId, payments) {
-  // 1. Validate ticket exists and is BORRADOR
-  const ticket = await repo.findTicketById(ticketId, businessId);
-  if (!ticket) throw appError('TICKET_NOT_FOUND', 'Ticket not found', 404);
-  if (ticket.estatus !== 'BORRADOR') throw appError('TICKET_NOT_DRAFT', 'Ticket is not a draft', 409);
-
-  // 2. Resolve payment method codes upfront
+  // 1. Resolve payment method codes upfront
   const methodCodes = payments.map((p) => p.method_code);
   const methods = await repo.findPaymentMethodsByCodes(methodCodes);
   const methodMap = new Map(methods.map((m) => [m.code, m]));
@@ -102,12 +97,19 @@ async function closeTicket(businessId, userId, ticketId, payments) {
     }
   }
 
-  // 3. Load ticket items for stock validation
-  const ticketItems = await repo.findTicketItems(ticketId);
-
-  // 4. Transactional close
+  // 2. Transactional close
   const closed = await knex.transaction(async (trx) => {
-    // 4a. Lock products and validate stock
+    // 2a. Lock ticket and validate current status
+    const ticket = await repo.findTicketByIdForUpdate(trx, ticketId, businessId);
+    if (!ticket) throw appError('TICKET_NOT_FOUND', 'Ticket not found', 404);
+    if (ticket.estatus !== 'BORRADOR') {
+      throw appError('TICKET_NOT_DRAFT', 'Ticket is not a draft', 409);
+    }
+
+    // 2b. Load ticket items inside transaction
+    const ticketItems = await repo.findTicketItems(ticketId, trx);
+
+    // 2c. Lock products and validate stock
     const productIds = ticketItems.map((i) => Number(i.product_id));
     const lockedProducts = await repo.lockProducts(trx, businessId, productIds);
     const prodMap = new Map(lockedProducts.map((p) => [Number(p.product_id), p]));
@@ -123,12 +125,12 @@ async function closeTicket(businessId, userId, ticketId, payments) {
       }
     }
 
-    // 4b. Lock business_settings, assign folio
+    // 2d. Lock business_settings, assign folio
     const settings = await repo.lockBusinessSettings(trx, businessId);
     const folio = Number(settings.ticket_folio_next);
     await repo.incrementFolioNext(trx, businessId);
 
-    // 4c. Validate payment sum
+    // 2e. Validate payment sum
     const total = Number(ticket.total);
     const sumPagos = round2(payments.reduce((s, p) => s + p.monto, 0));
     if (sumPagos < total) {
@@ -137,7 +139,19 @@ async function closeTicket(businessId, userId, ticketId, payments) {
     const cambio = round2(sumPagos - total);
     // NOTE: cambio is allowed even if no EFECTIVO method present — simplification
 
-    // 4d. Insert sale_payment rows
+    // 2f. Conditionally close ticket only if it is still BORRADOR
+    // (extra guard for concurrent close attempts).
+    const updated = await repo.updateTicketCloseIfDraft(trx, ticketId, businessId, {
+      estatus: 'CERRADO',
+      folio,
+      closed_at: knex.fn.now(),
+      cambio,
+    });
+    if (!updated) {
+      throw appError('TICKET_NOT_DRAFT', 'Ticket is not a draft', 409);
+    }
+
+    // 2g. Insert sale_payment rows (only after conditional close succeeds)
     const paymentRows = payments.map((p) => ({
       business_id: businessId,
       ticket_id: ticketId,
@@ -148,7 +162,7 @@ async function closeTicket(businessId, userId, ticketId, payments) {
     }));
     await repo.insertPayments(trx, paymentRows);
 
-    // 4e. Deduct stock + insert inventory movements
+    // 2h. Deduct stock + insert inventory movements
     const movementRows = [];
     for (const item of ticketItems) {
       await repo.updateProductStock(trx, item.product_id, Number(item.cantidad));
@@ -164,18 +178,10 @@ async function closeTicket(businessId, userId, ticketId, payments) {
     }
     await repo.insertInventoryMovements(trx, movementRows);
 
-    // 4f. Close the ticket
-    const updated = await repo.updateTicketClose(trx, ticketId, {
-      estatus: 'CERRADO',
-      folio,
-      closed_at: knex.fn.now(),
-      cambio,
-    });
-
     return updated;
   });
 
-  // 5. Audit (outside transaction — must not cause rollback)
+  // 3. Audit (outside transaction — must not cause rollback)
   await repo.insertAuditLog({
     business_id: businessId,
     event_code: 'TICKET_CLOSED',

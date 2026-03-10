@@ -16,10 +16,10 @@ async function findPaymentMethodsByCodes(codes, trx) {
   return conn('payment_method').whereIn('code', codes);
 }
 
-async function findTicketById(ticketId, businessId, trx) {
-  const conn = trx || knex;
-  return conn('sale_ticket')
+async function findTicketByIdForUpdate(trx, ticketId, businessId) {
+  return trx('sale_ticket')
     .where({ ticket_id: ticketId, business_id: businessId })
+    .forUpdate()
     .first();
 }
 
@@ -69,9 +69,9 @@ async function updateProductStock(trx, productId, cantidad) {
     .decrement('stock_actual', cantidad);
 }
 
-async function updateTicketClose(trx, ticketId, data) {
+async function updateTicketCloseIfDraft(trx, ticketId, businessId, data) {
   const [row] = await trx('sale_ticket')
-    .where('ticket_id', ticketId)
+    .where({ ticket_id: ticketId, business_id: businessId, estatus: 'BORRADOR' })
     .update(data)
     .returning('*');
   return row;
@@ -95,7 +95,7 @@ async function insertAuditLog(data) {
 module.exports = {
   findProductsByIds,
   findPaymentMethodsByCodes,
-  findTicketById,
+  findTicketByIdForUpdate,
   findTicketItems,
   lockProducts,
   lockBusinessSettings,
@@ -104,7 +104,7 @@ module.exports = {
   insertPayments,
   insertInventoryMovements,
   updateProductStock,
-  updateTicketClose,
+  updateTicketCloseIfDraft,
   incrementFolioNext,
   insertAuditLog,
 };
