@@ -13,6 +13,7 @@ const reportRoutes = require('../modules/reports/reports.routes');
 const settingsRoutes = require('../modules/settings/settings.routes');
 const auditRoutes    = require('../modules/audit/audit.routes');
 const usersRoutes    = require('../modules/users/users.routes');
+const rolesRoutes    = require('../modules/roles/roles.routes');
 
 async function registerRoutes(fastify) {
   fastify.register(authRoutes, { prefix: '/auth' });
@@ -28,6 +29,7 @@ async function registerRoutes(fastify) {
   fastify.register(settingsRoutes, { prefix: '/settings' });
   fastify.register(auditRoutes,    { prefix: '/audit' });
   fastify.register(usersRoutes,    { prefix: '/users' });
+  fastify.register(rolesRoutes,    { prefix: '/roles' });
 }
 
 module.exports = registerRoutes;

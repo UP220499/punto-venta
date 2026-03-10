@@ -34,6 +34,9 @@ exports.seed = async function (knex) {
     { code: 'USER_UPDATE',           descripcion: 'Editar usuarios' },
     { code: 'USER_DELETE',           descripcion: 'Eliminar usuarios' },
     { code: 'USER_WRITE',            descripcion: 'Crear, editar y administrar usuarios' },
+    // Roles
+    { code: 'ROLE_READ',             descripcion: 'Ver roles y permisos' },
+    { code: 'ROLE_WRITE',            descripcion: 'Editar permisos de roles' },
     // Audit
     { code: 'AUDIT_READ',            descripcion: 'Ver log de auditoría' },
   ];

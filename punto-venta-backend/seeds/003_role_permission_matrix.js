@@ -11,6 +11,7 @@ exports.seed = async function (knex) {
       'REPORT_SALES', 'REPORT_INVENTORY', 'REPORT_READ',
       'SETTINGS_MANAGE', 'SETTINGS_READ', 'SETTINGS_WRITE',
       'USER_CREATE', 'USER_READ', 'USER_UPDATE', 'USER_DELETE', 'USER_WRITE',
+      'ROLE_READ', 'ROLE_WRITE',
       'AUDIT_READ',
     ],
     CAJERO: [
