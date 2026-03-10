@@ -37,7 +37,7 @@ npx playwright install chromium
 
 REM 4. Configurar variables de entorno
 copy .env.example .env
-REM Editar .env: DB_HOST, DB_PORT, DB_NAME, DB_USER, DB_PASSWORD, JWT_SECRET, PORT, NODE_ENV
+REM Editar .env: DB_HOST, DB_PORT, DB_NAME, DB_USER, DB_PASSWORD, JWT_SECRET, PORT, NODE_ENV, CORS_ORIGINS
 
 REM 5. Crear base de datos (si no existe)
 psql -U postgres -c "CREATE DATABASE punto_venta;"
@@ -98,6 +98,26 @@ Respuestas esperadas:
 - `/health/version` → `{"name":"punto-venta-backend","version":"1.0.0","node":"v20.x.x","env":"development","uptime_seconds":<n>,"commit":null}`
 
 ---
+
+
+## 5.1 Verificación de CORS whitelist
+
+```bat
+REM Origin permitido (ajusta al valor configurado en CORS_ORIGINS)
+curl -i -X OPTIONS http://127.0.0.1:3000/health ^
+  -H "Origin: http://localhost:5173" ^
+  -H "Access-Control-Request-Method: GET"
+
+REM Origin no permitido (debe no incluir Access-Control-Allow-Origin)
+curl -i -X OPTIONS http://127.0.0.1:3000/health ^
+  -H "Origin: https://evil.example" ^
+  -H "Access-Control-Request-Method: GET"
+```
+
+Esperado:
+- Origin permitido: `204` con `access-control-allow-origin`.
+- Origin no permitido: respuesta bloqueada/no CORS (sin `access-control-allow-origin`).
+- Sin `Origin` (Postman/curl): permitido.
 
 ## 6. Flujo Postman recomendado
 

@@ -157,7 +157,7 @@ async function closeTicket(businessId, userId, ticketId, payments) {
       ticket_id: ticketId,
       method_id: methodMap.get(p.method_code).method_id,
       monto: p.monto,
-      referencia: p.referencia || null,
+      referencia: p.referencia ?? null,
       created_by: userId,
     }));
     await repo.insertPayments(trx, paymentRows);
