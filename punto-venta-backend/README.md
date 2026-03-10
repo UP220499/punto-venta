@@ -68,13 +68,29 @@ JWT_SECRET=cambia_esto_por_un_secreto_seguro_de_al_menos_32_caracteres
 # ID del negocio activo en la base de datos
 BUSINESS_ID=1
 
-# CORS — origenes permitidos separados por coma
-CORS_ORIGINS=http://localhost:5173,http://localhost:3001
+# CORS — origenes permitidos separados por coma (CSV)
+# Ejemplo frontend local (Vite):
+CORS_ORIGINS=http://localhost:5173,http://127.0.0.1:5173
 ```
 
 > **Nunca** subas el archivo `.env` al repositorio. Ya esta en `.gitignore`.
 
 ---
+
+
+### CORS (`CORS_ORIGINS`)
+
+- Si defines `CORS_ORIGINS`, solo esos orígenes (CSV) quedan permitidos.
+- Se aceptan requests **sin header `Origin`** (por ejemplo `curl`/Postman).
+- Si `CORS_ORIGINS` no está definido:
+  - `NODE_ENV=production`: se bloquean orígenes externos por defecto.
+  - `NODE_ENV!=production`: se permiten por defecto `http://localhost:5173` y `http://127.0.0.1:5173`.
+
+Ejemplo:
+
+```env
+CORS_ORIGINS=http://localhost:5173,http://127.0.0.1:5173
+```
 
 ## Base de Datos
 
