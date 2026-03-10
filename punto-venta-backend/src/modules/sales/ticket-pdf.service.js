@@ -1,8 +1,19 @@
 'use strict';
 
-const { chromium } = require('playwright');
+const { chromium, errors } = require('playwright');
 const printService = require('./ticket-print.service');
 const printRepo = require('./ticket-print.repository');
+
+function appError(code, message, statusCode) {
+  const err = new Error(message);
+  err.code = code;
+  err.statusCode = statusCode;
+  return err;
+}
+
+function isTimeoutError(err) {
+  return err instanceof errors.TimeoutError || (err && typeof err.message === 'string' && err.message.includes('Timeout'));
+}
 
 /**
  * Generate a PDF buffer for the given ticket.
@@ -22,21 +33,45 @@ async function generateTicketPdf(ticketId, businessId) {
   ]);
 
   const widthMm = (settings && settings.ticket_paper_width === 80) ? '80mm' : '58mm';
+  const timeoutMs = Number(process.env.PDF_RENDER_TIMEOUT_MS || 15000);
 
   let browser;
+  let context;
+  let page;
   try {
-    browser = await chromium.launch();
-    const page = await browser.newPage();
-    await page.setContent(html, { waitUntil: 'load' });
+    browser = await chromium.launch({ timeout: timeoutMs });
+    context = await browser.newContext();
+    context.setDefaultTimeout(timeoutMs);
+
+    page = await context.newPage();
+    page.setDefaultTimeout(timeoutMs);
+
+    await page.setContent(html, { waitUntil: 'domcontentloaded', timeout: timeoutMs });
     const pdfBuffer = await page.pdf({
       printBackground: true,
       width: widthMm,
+      timeout: timeoutMs,
       // height is auto (page grows to fit content)
       margin: { top: '0mm', right: '0mm', bottom: '0mm', left: '0mm' },
     });
+
     return pdfBuffer;
+  } catch (err) {
+    if (err && err.statusCode) throw err;
+    if (isTimeoutError(err)) {
+      throw appError('PDF_TIMEOUT', 'PDF generation timed out', 504);
+    }
+    throw appError('PDF_RENDER_FAILED', 'Failed to generate PDF', 500);
   } finally {
-    if (browser) await browser.close().catch(() => {});
+    if (page) {
+      try { await page.close(); } catch (_err) {}
+    }
+    if (context) {
+      try { await context.close(); } catch (_err) {}
+    }
+    if (browser) {
+      try { await browser.close(); } catch (_err) {}
+    }
   }
 }
 
