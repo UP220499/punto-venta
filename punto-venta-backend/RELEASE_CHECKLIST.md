@@ -136,7 +136,7 @@ curl -s -X POST http://127.0.0.1:3000/auth/login ^
   -H "Content-Type: application/json" ^
   -d "{\"username\":\"admin\",\"password\":\"admin123\"}" -o login.json
 
-for /f "delims=" %T in ('node -e "process.stdout.write(require('./login.json').token)"') do set ADMIN=%T
+for /f "delims=" %T in ('node -e "process.stdout.write(require('./login.json').access_token)"') do set ADMIN=%T
 
 REM Debe responder 200
 curl -s http://127.0.0.1:3000/audit -H "Authorization: Bearer %ADMIN%"
@@ -150,7 +150,7 @@ curl -s -X POST http://127.0.0.1:3000/auth/login ^
   -H "Content-Type: application/json" ^
   -d "{\"username\":\"cajero\",\"password\":\"cajero123\"}" -o cajero.json
 
-for /f "delims=" %T in ('node -e "process.stdout.write(require('./cajero.json').token)"') do set CAJERO=%T
+for /f "delims=" %T in ('node -e "process.stdout.write(require('./cajero.json').access_token)"') do set CAJERO=%T
 
 REM Debe responder 403 FORBIDDEN en:
 curl -s http://127.0.0.1:3000/audit      -H "Authorization: Bearer %CAJERO%"
