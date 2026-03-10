@@ -19,6 +19,15 @@ const closeTicketSchema = z.object({
       z.object({
         method_code: z.string().min(1),
         monto: z.number().positive(),
+        referencia: z
+          .string()
+          .trim()
+          .max(80, 'referencia must be at most 80 characters')
+          .nullish()
+          .transform((value) => {
+            if (value === null || value === undefined || value === '') return null;
+            return value;
+          }),
       })
     )
     .min(1, 'At least one payment is required'),
