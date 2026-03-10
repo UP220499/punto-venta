@@ -34,6 +34,9 @@ exports.seed = async function (knex) {
     { code: 'USER_UPDATE',           descripcion: 'Editar usuarios' },
     { code: 'USER_DELETE',           descripcion: 'Eliminar usuarios' },
     { code: 'USER_WRITE',            descripcion: 'Crear, editar y administrar usuarios' },
+    // Payment methods
+    { code: 'PAYMENT_METHOD_READ',   descripcion: 'Ver métodos de pago' },
+    { code: 'PAYMENT_METHOD_WRITE',  descripcion: 'Crear y editar métodos de pago' },
     // Roles
     { code: 'ROLE_READ',             descripcion: 'Ver roles y permisos' },
     { code: 'ROLE_WRITE',            descripcion: 'Editar permisos de roles' },
