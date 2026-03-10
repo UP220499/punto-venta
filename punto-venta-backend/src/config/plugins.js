@@ -37,8 +37,6 @@ async function registerPlugins(fastify) {
 
   await fastify.register(cors, { origin: buildCorsOriginResolver(process.env), strictPreflight: false });
 
-  await fastify.register(cors, { origin: buildCorsOriginResolver(process.env) });
-
   await fastify.register(helmet);
   await fastify.register(rateLimit, { max: 100, timeWindow: '1 minute' });
   await fastify.register(jwt, { secret: process.env.JWT_SECRET });
