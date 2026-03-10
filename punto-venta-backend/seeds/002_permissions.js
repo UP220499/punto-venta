@@ -33,6 +33,7 @@ exports.seed = async function (knex) {
     { code: 'USER_READ',             descripcion: 'Ver usuarios' },
     { code: 'USER_UPDATE',           descripcion: 'Editar usuarios' },
     { code: 'USER_DELETE',           descripcion: 'Eliminar usuarios' },
+    { code: 'USER_WRITE',            descripcion: 'Crear, editar y administrar usuarios' },
     // Audit
     { code: 'AUDIT_READ',            descripcion: 'Ver log de auditoría' },
   ];
