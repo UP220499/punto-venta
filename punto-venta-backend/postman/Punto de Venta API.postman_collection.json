@@ -291,7 +291,7 @@
               "host": ["{{base_url}}"],
               "path": ["tickets"]
             },
-            "description": "Crea un ticket de venta en estado ABIERTO. Guarda ticket_id automaticamente. Requiere permiso SALE_CREATE."
+            "description": "Crea un ticket de venta en estado BORRADOR. Guarda ticket_id automaticamente. Requiere permiso SALE_CREATE."
           }
         },
         {
@@ -348,7 +348,7 @@
               "query": [
                 { "key": "page",      "value": "1" },
                 { "key": "page_size", "value": "20" },
-                { "key": "estatus",   "value": "CERRADO", "disabled": true, "description": "ABIERTO | CERRADO | CANCELADO" },
+                { "key": "estatus",   "value": "CERRADO", "disabled": true, "description": "BORRADOR | CERRADO" },
                 { "key": "folio",     "value": "",         "disabled": true, "description": "Numero de folio exacto" },
                 { "key": "from",      "value": "",         "disabled": true, "description": "ISO 8601 datetime" },
                 { "key": "to",        "value": "",         "disabled": true, "description": "ISO 8601 datetime" }
@@ -772,6 +772,275 @@
               ]
             },
             "description": "Lista el log de auditoria del negocio. Requiere permiso AUDIT_READ."
+          }
+        }
+      ]
+    },
+    {
+      "name": "10 Users (Admin)",
+      "item": [
+        {
+          "name": "List Users",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('Status 200', () => pm.response.to.have.status(200));",
+            "pm.test('Has data array', () => pm.expect(pm.response.json().data).to.be.an('array'));"
+          ]}}],
+          "request": {
+            "method": "GET", "header": [],
+            "url": {
+              "raw": "{{base_url}}/users?page=1&page_size=20",
+              "host": ["{{base_url}}"], "path": ["users"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "page_size", "value": "20" },
+                { "key": "estatus", "value": "ACTIVO", "disabled": true, "description": "ACTIVO | INACTIVO" }
+              ]
+            },
+            "description": "Lista usuarios del negocio. Requiere permiso USER_READ (solo ADMIN)."
+          }
+        },
+        {
+          "name": "Get User",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('Status 200', () => pm.response.to.have.status(200));",
+            "pm.test('Has user_id', () => pm.expect(pm.response.json()).to.have.property('user_id'));"
+          ]}}],
+          "request": {
+            "method": "GET", "header": [],
+            "url": {
+              "raw": "{{base_url}}/users/1",
+              "host": ["{{base_url}}"], "path": ["users", "1"]
+            },
+            "description": "Detalle de un usuario. Requiere permiso USER_READ (solo ADMIN)."
+          }
+        },
+        {
+          "name": "Create User",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('Status 201', () => pm.response.to.have.status(201));",
+            "pm.test('Has user_id', () => pm.expect(pm.response.json()).to.have.property('user_id'));"
+          ]}}],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"nuevo_cajero\",\n  \"password\": \"password123\",\n  \"nombre\": \"Nuevo Cajero\",\n  \"role_codes\": [\"CAJERO\"]\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/users",
+              "host": ["{{base_url}}"], "path": ["users"]
+            },
+            "description": "Crea un usuario en el negocio. Requiere permiso USER_WRITE (solo ADMIN)."
+          }
+        },
+        {
+          "name": "Update User",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('Status 200', () => pm.response.to.have.status(200));"
+          ]}}],
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Nombre Actualizado\",\n  \"estatus\": \"ACTIVO\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/users/1",
+              "host": ["{{base_url}}"], "path": ["users", "1"]
+            },
+            "description": "Actualiza datos de un usuario. Requiere permiso USER_WRITE (solo ADMIN)."
+          }
+        },
+        {
+          "name": "Reset Password",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('Status 204', () => pm.response.to.have.status(204));"
+          ]}}],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"new_password\": \"nueva_contrasena123\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/users/1/reset-password",
+              "host": ["{{base_url}}"], "path": ["users", "1", "reset-password"]
+            },
+            "description": "Restablece la contrasena de un usuario. Requiere permiso USER_WRITE (solo ADMIN)."
+          }
+        },
+        {
+          "name": "Set User Roles",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('Status 200', () => pm.response.to.have.status(200));"
+          ]}}],
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"role_codes\": [\"CAJERO\"]\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/users/1/roles",
+              "host": ["{{base_url}}"], "path": ["users", "1", "roles"]
+            },
+            "description": "Reemplaza los roles de un usuario. Requiere permiso USER_WRITE (solo ADMIN)."
+          }
+        }
+      ]
+    },
+    {
+      "name": "11 Roles (Admin)",
+      "item": [
+        {
+          "name": "List Roles",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('Status 200', () => pm.response.to.have.status(200));",
+            "pm.test('Is array', () => pm.expect(pm.response.json()).to.be.an('array'));"
+          ]}}],
+          "request": {
+            "method": "GET", "header": [],
+            "url": {
+              "raw": "{{base_url}}/roles",
+              "host": ["{{base_url}}"], "path": ["roles"]
+            },
+            "description": "Lista todos los roles con sus permisos. Requiere permiso ROLE_READ (solo ADMIN)."
+          }
+        },
+        {
+          "name": "List All Permissions",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('Status 200', () => pm.response.to.have.status(200));",
+            "pm.test('Is array', () => pm.expect(pm.response.json()).to.be.an('array'));"
+          ]}}],
+          "request": {
+            "method": "GET", "header": [],
+            "url": {
+              "raw": "{{base_url}}/roles/permissions",
+              "host": ["{{base_url}}"], "path": ["roles", "permissions"]
+            },
+            "description": "Lista todos los permisos disponibles en el sistema. Requiere permiso ROLE_READ (solo ADMIN)."
+          }
+        },
+        {
+          "name": "Get Role",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('Status 200', () => pm.response.to.have.status(200));",
+            "pm.test('Has role_id', () => pm.expect(pm.response.json()).to.have.property('role_id'));",
+            "pm.test('Has permissions', () => pm.expect(pm.response.json().permissions).to.be.an('array'));"
+          ]}}],
+          "request": {
+            "method": "GET", "header": [],
+            "url": {
+              "raw": "{{base_url}}/roles/2",
+              "host": ["{{base_url}}"], "path": ["roles", "2"]
+            },
+            "description": "Detalle de un rol con sus permisos. Requiere permiso ROLE_READ (solo ADMIN)."
+          }
+        },
+        {
+          "name": "Set Role Permissions",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('Status 200', () => pm.response.to.have.status(200));",
+            "pm.test('Has permissions', () => pm.expect(pm.response.json().permissions).to.be.an('array'));"
+          ]}}],
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"permission_codes\": [\"PRODUCT_READ\", \"SALE_CREATE\", \"SALE_VIEW\", \"SALE_CLOSE\"]\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/roles/2/permissions",
+              "host": ["{{base_url}}"], "path": ["roles", "2", "permissions"]
+            },
+            "description": "Reemplaza los permisos de un rol. No se puede modificar el rol ADMIN (409). Requiere permiso ROLE_WRITE (solo ADMIN)."
+          }
+        }
+      ]
+    },
+    {
+      "name": "12 Payment Methods (Admin)",
+      "item": [
+        {
+          "name": "List Payment Methods",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('Status 200', () => pm.response.to.have.status(200));",
+            "pm.test('Is array', () => pm.expect(pm.response.json()).to.be.an('array'));"
+          ]}}],
+          "request": {
+            "method": "GET", "header": [],
+            "url": {
+              "raw": "{{base_url}}/payment-methods",
+              "host": ["{{base_url}}"], "path": ["payment-methods"]
+            },
+            "description": "Lista todos los metodos de pago. Requiere permiso PAYMENT_METHOD_READ (ADMIN y CAJERO)."
+          }
+        },
+        {
+          "name": "Create Payment Method",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('Status 201', () => pm.response.to.have.status(201));",
+            "pm.test('Has payment_method_id', () => pm.expect(pm.response.json()).to.have.property('payment_method_id'));"
+          ]}}],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"code\": \"TRANSFERENCIA\",\n  \"nombre_visible\": \"Transferencia bancaria\",\n  \"sort_order\": 2,\n  \"requires_reference\": true\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/payment-methods",
+              "host": ["{{base_url}}"], "path": ["payment-methods"]
+            },
+            "description": "Crea un metodo de pago. Requiere permiso PAYMENT_METHOD_WRITE (solo ADMIN)."
+          }
+        },
+        {
+          "name": "Update Payment Method",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('Status 200', () => pm.response.to.have.status(200));",
+            "pm.test('Has payment_method_id', () => pm.expect(pm.response.json()).to.have.property('payment_method_id'));"
+          ]}}],
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre_visible\": \"Transferencia SPEI\",\n  \"sort_order\": 3\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/payment-methods/3",
+              "host": ["{{base_url}}"], "path": ["payment-methods", "3"]
+            },
+            "description": "Actualiza un metodo de pago. Requiere permiso PAYMENT_METHOD_WRITE (solo ADMIN)."
+          }
+        },
+        {
+          "name": "Delete Payment Method (soft)",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('Status 204', () => pm.response.to.have.status(204));"
+          ]}}],
+          "request": {
+            "method": "DELETE", "header": [],
+            "url": {
+              "raw": "{{base_url}}/payment-methods/3",
+              "host": ["{{base_url}}"], "path": ["payment-methods", "3"]
+            },
+            "description": "Desactiva un metodo de pago (soft-delete, estatus INACTIVO). No se puede desactivar EFECTIVO (409). Requiere permiso PAYMENT_METHOD_WRITE (solo ADMIN)."
           }
         }
       ]

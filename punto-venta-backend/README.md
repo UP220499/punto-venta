@@ -13,6 +13,8 @@ API REST para sistema de Punto de Venta construida con **Node.js**, **Fastify**,
 5. [Ejecutar el Servidor](#ejecutar-el-servidor)
 6. [Importar en Postman](#importar-en-postman)
 7. [Documentacion de la API](#documentacion-de-la-api)
+   - Health, Auth, Products, Barcodes, Tickets, Print, Inventory, Reports, Settings, Audit
+   - [Users (Admin)](#users-admin), [Roles (Admin)](#roles-admin), [Payment Methods (Admin)](#payment-methods-admin)
 8. [Autenticacion](#autenticacion)
 9. [Permisos](#permisos)
 10. [Seguridad](#seguridad)
@@ -240,12 +242,12 @@ La variable `ticket_id` tambien se actualiza al crear un ticket con **Create Tic
 
 ### Tickets (Ventas)
 
-| Metodo | Ruta               | Descripcion                    | Permiso     |
-|--------|--------------------|--------------------------------|-------------|
-| POST   | /tickets           | Crea ticket en estado ABIERTO  | SALE_CREATE |
-| POST   | /tickets/:id/close | Cierra ticket y registra pagos | SALE_CLOSE  |
-| GET    | /tickets           | Lista tickets (paginado)       | SALE_VIEW   |
-| GET    | /tickets/:id       | Detalle de un ticket           | SALE_VIEW   |
+| Metodo | Ruta                      | Descripcion                    | Permiso     |
+|--------|---------------------------|--------------------------------|-------------|
+| POST   | /tickets                  | Crea ticket en estado BORRADOR | SALE_CREATE |
+| POST   | /tickets/:ticket_id/close | Cierra ticket y registra pagos | SALE_CLOSE  |
+| GET    | /tickets                  | Lista tickets (paginado)       | SALE_VIEW   |
+| GET    | /tickets/:ticket_id       | Detalle de un ticket           | SALE_VIEW   |
 
 **Body de POST /tickets:**
 ```json
@@ -257,7 +259,7 @@ La variable `ticket_id` tambien se actualiza al crear un ticket con **Create Tic
 }
 ```
 
-**Body de POST /tickets/:id/close:**
+**Body de POST /tickets/:ticket_id/close:**
 ```json
 {
   "payments": [
@@ -273,7 +275,7 @@ La variable `ticket_id` tambien se actualiza al crear un ticket con **Create Tic
 |-----------|--------|---------|--------------------------------------|
 | page      | int    | 1       | Numero de pagina                     |
 | page_size | int    | 20      | Resultados por pagina                |
-| estatus   | enum   | —       | ABIERTO \| CERRADO \| CANCELADO      |
+| estatus   | enum   | —       | BORRADOR \| CERRADO                  |
 | folio     | string | —       | Numero de folio exacto               |
 | from      | string | —       | ISO 8601 datetime con offset         |
 | to        | string | —       | ISO 8601 datetime con offset         |
@@ -284,8 +286,8 @@ La variable `ticket_id` tambien se actualiza al crear un ticket con **Create Tic
 
 | Metodo | Ruta                    | Descripcion                | Permiso   |
 |--------|-------------------------|----------------------------|-----------|
-| GET    | /tickets/:id/print/html | Renderiza ticket como HTML | SALE_VIEW |
-| GET    | /tickets/:id/print/pdf  | Genera ticket como PDF     | SALE_VIEW |
+| GET    | /tickets/:ticket_id/print/html | Renderiza ticket como HTML | SALE_VIEW |
+| GET    | /tickets/:ticket_id/print/pdf  | Genera ticket como PDF     | SALE_VIEW |
 
 > El endpoint PDF usa **Playwright** (Chromium headless).
 > Ejecuta `npx playwright install chromium` antes de usarlo.
@@ -390,6 +392,65 @@ Ejemplo: `?from=2025-01-01T00:00:00-06:00&to=2025-12-31T23:59:59-06:00`
 
 ---
 
+### Users (Admin)
+
+| Metodo | Ruta                             | Descripcion                       | Permiso    |
+|--------|----------------------------------|-----------------------------------|------------|
+| GET    | /users                           | Lista usuarios del negocio        | USER_READ  |
+| GET    | /users/:user_id                  | Detalle de un usuario             | USER_READ  |
+| POST   | /users                           | Crea un usuario                   | USER_WRITE |
+| PATCH  | /users/:user_id                  | Actualiza datos del usuario       | USER_WRITE |
+| POST   | /users/:user_id/reset-password   | Restablece contrasena del usuario | USER_WRITE |
+| PUT    | /users/:user_id/roles            | Reemplaza los roles del usuario   | USER_WRITE |
+
+> Solo el rol ADMIN tiene USER_READ y USER_WRITE. Un usuario no puede modificar su propio rol.
+
+---
+
+### Roles (Admin)
+
+| Metodo | Ruta                        | Descripcion                            | Permiso    |
+|--------|-----------------------------|----------------------------------------|------------|
+| GET    | /roles                      | Lista todos los roles                  | ROLE_READ  |
+| GET    | /roles/permissions          | Lista todos los permisos disponibles   | ROLE_READ  |
+| GET    | /roles/:role_id             | Detalle de un rol con sus permisos     | ROLE_READ  |
+| PUT    | /roles/:role_id/permissions | Reemplaza los permisos de un rol       | ROLE_WRITE |
+
+> Solo el rol ADMIN tiene ROLE_READ y ROLE_WRITE. No se pueden modificar los permisos del rol `ADMIN`.
+
+**Body de PUT /roles/:role_id/permissions:**
+```json
+{
+  "permission_codes": ["PRODUCT_READ", "SALE_CREATE", "SALE_VIEW"]
+}
+```
+
+---
+
+### Payment Methods (Admin)
+
+| Metodo | Ruta                                | Descripcion                              | Permiso              |
+|--------|-------------------------------------|------------------------------------------|----------------------|
+| GET    | /payment-methods                    | Lista metodos de pago                    | PAYMENT_METHOD_READ  |
+| POST   | /payment-methods                    | Crea un metodo de pago                   | PAYMENT_METHOD_WRITE |
+| PATCH  | /payment-methods/:payment_method_id | Actualiza un metodo de pago              | PAYMENT_METHOD_WRITE |
+| DELETE | /payment-methods/:payment_method_id | Desactiva un metodo de pago (soft-delete)| PAYMENT_METHOD_WRITE |
+
+> ADMIN tiene PAYMENT_METHOD_READ y PAYMENT_METHOD_WRITE. CAJERO solo tiene PAYMENT_METHOD_READ.
+> No se puede desactivar el metodo con `code='EFECTIVO'`.
+
+**Body de POST /payment-methods:**
+```json
+{
+  "code": "TRANSFERENCIA",
+  "nombre_visible": "Transferencia bancaria",
+  "sort_order": 2,
+  "requires_reference": true
+}
+```
+
+---
+
 ## Autenticacion
 
 La API usa **JWT (JSON Web Tokens)** con algoritmo HS256.
@@ -405,19 +466,25 @@ La API usa **JWT (JSON Web Tokens)** con algoritmo HS256.
 
 El sistema usa un modelo de permisos granular. Cada endpoint requiere un permiso especifico:
 
-| Permiso         | Descripcion                              |
-|-----------------|------------------------------------------|
-| PRODUCT_READ    | Ver productos y codigos de barras        |
-| PRODUCT_WRITE   | Crear/editar productos y codigos         |
-| SALE_CREATE     | Crear tickets de venta                   |
-| SALE_CLOSE      | Cerrar tickets y registrar pagos         |
-| SALE_VIEW       | Ver tickets e imprimir                   |
-| INVENTORY_READ  | Ver movimientos e inventario             |
-| INVENTORY_WRITE | Registrar entradas y ajustes             |
-| REPORT_READ     | Ver reportes                             |
-| SETTINGS_READ   | Ver configuracion del negocio            |
-| SETTINGS_WRITE  | Modificar configuracion del negocio      |
-| AUDIT_READ      | Ver logs de auditoria                    |
+| Permiso               | Descripcion                              |
+|-----------------------|------------------------------------------|
+| PRODUCT_READ          | Ver productos y codigos de barras        |
+| PRODUCT_WRITE         | Crear/editar productos y codigos         |
+| SALE_CREATE           | Crear tickets de venta                   |
+| SALE_CLOSE            | Cerrar tickets y registrar pagos         |
+| SALE_VIEW             | Ver tickets e imprimir                   |
+| INVENTORY_READ        | Ver movimientos e inventario             |
+| INVENTORY_WRITE       | Registrar entradas y ajustes             |
+| REPORT_READ           | Ver reportes                             |
+| SETTINGS_READ         | Ver configuracion del negocio            |
+| SETTINGS_WRITE        | Modificar configuracion del negocio      |
+| AUDIT_READ            | Ver logs de auditoria                    |
+| USER_READ             | Ver usuarios del negocio                 |
+| USER_WRITE            | Crear/editar/desactivar usuarios         |
+| ROLE_READ             | Ver roles y permisos disponibles         |
+| ROLE_WRITE            | Editar permisos de roles                 |
+| PAYMENT_METHOD_READ   | Ver metodos de pago                      |
+| PAYMENT_METHOD_WRITE  | Crear/editar/desactivar metodos de pago  |
 
 Los permisos se asignan a roles, y los roles a usuarios en la base de datos.
 
@@ -453,7 +520,10 @@ punto-venta-backend/
 │   │   ├── inventory/            # Entradas, ajustes, movimientos
 │   │   ├── reports/              # Reportes de ventas e inventario
 │   │   ├── settings/             # Configuracion del negocio
-│   │   └── audit/                # Log de auditoria
+│   │   ├── audit/                # Log de auditoria
+│   │   ├── users/                # CRUD de usuarios (ADMIN)
+│   │   ├── roles/                # Roles y permisos (ADMIN)
+│   │   └── payments/             # Metodos de pago (ADMIN)
 │   └── shared/
 │       ├── error-handler.js      # Manejador global de errores
 │       └── permissions.js        # Middleware de permisos
