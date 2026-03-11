@@ -17,13 +17,19 @@ api.interceptors.request.use((config) => {
   return config
 })
 
-// Si el servidor devuelve 401, limpiar sesión y redirigir al login
+// 401: limpiar sesión y redirigir, excepto si el error viene del propio login
 api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      clearSession()
-      window.location.href = '/login'
+      const isLoginAttempt = error.config?.url?.includes('/auth/login')
+      if (!isLoginAttempt) {
+        clearSession()
+        // Evitar redirect loop si ya estamos en /login
+        if (window.location.pathname !== '/login') {
+          window.location.href = '/login'
+        }
+      }
     }
     return Promise.reject(error)
   },

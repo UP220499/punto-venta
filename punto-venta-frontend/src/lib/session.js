@@ -3,7 +3,13 @@ const USER_KEY = 'pos_user'
 
 function decodeJwtPayload(token) {
   try {
-    const base64 = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')
+    if (!token || typeof token !== 'string') return null
+    const parts = token.split('.')
+    if (parts.length !== 3) return null
+    // Convertir base64url → base64 estándar y agregar padding necesario
+    let base64 = parts[1].replace(/-/g, '+').replace(/_/g, '/')
+    const pad = base64.length % 4
+    if (pad) base64 += '='.repeat(4 - pad)
     return JSON.parse(atob(base64))
   } catch {
     return null

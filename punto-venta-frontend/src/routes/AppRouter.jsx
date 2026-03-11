@@ -1,16 +1,21 @@
 import { createBrowserRouter, RouterProvider, Navigate } from 'react-router-dom'
-import { isAuthenticated } from '../lib/session'
+import { useAuth } from '../contexts/AuthContext'
 import { ProtectedRoute } from './ProtectedRoute'
 import { PublicRoute } from './PublicRoute'
 import { AuthLayout } from '../components/layout/AuthLayout'
 import { LoginPage } from '../pages/login/LoginPage'
 import { DashboardPage } from '../pages/dashboard/DashboardPage'
 
+// Redirección reactiva: responde al estado de auth en tiempo real
+function RootRedirect() {
+  const { user } = useAuth()
+  return <Navigate to={user ? '/dashboard' : '/login'} replace />
+}
+
 const router = createBrowserRouter([
   {
-    // Ruta raíz: redirige según el estado de sesión
     path: '/',
-    element: <Navigate to={isAuthenticated() ? '/dashboard' : '/login'} replace />,
+    element: <RootRedirect />,
   },
   {
     // Rutas públicas: si ya hay sesión, redirige al dashboard

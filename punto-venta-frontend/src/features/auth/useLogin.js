@@ -1,6 +1,5 @@
 import { useMutation } from '@tanstack/react-query'
 import api from '../../lib/axios'
-import { setSession } from '../../lib/session'
 
 async function loginRequest(credentials) {
   // POST /auth/login → { access_token: "JWT" }
@@ -8,11 +7,8 @@ async function loginRequest(credentials) {
   return data
 }
 
+// Solo llama a la API. El componente decide qué hacer en onSuccess
+// (persistir sesión via AuthContext.login, navegar, etc.)
 export function useLogin() {
-  return useMutation({
-    mutationFn: loginRequest,
-    onSuccess: (data) => {
-      setSession(data.access_token)
-    },
-  })
+  return useMutation({ mutationFn: loginRequest })
 }

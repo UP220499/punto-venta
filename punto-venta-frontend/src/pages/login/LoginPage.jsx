@@ -3,6 +3,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { useNavigate } from 'react-router-dom'
 import { useLogin } from '../../features/auth/useLogin'
+import { useAuth } from '../../contexts/AuthContext'
 
 const loginSchema = z.object({
   username: z.string().min(1, 'El usuario es requerido'),
@@ -11,7 +12,8 @@ const loginSchema = z.object({
 
 export function LoginPage() {
   const navigate = useNavigate()
-  const { mutate: login, isPending, error, isError } = useLogin()
+  const { login: setAuthSession } = useAuth()
+  const { mutate: loginMutation, isPending, error, isError } = useLogin()
 
   const {
     register,
@@ -20,8 +22,11 @@ export function LoginPage() {
   } = useForm({ resolver: zodResolver(loginSchema) })
 
   function onSubmit(data) {
-    login(data, {
-      onSuccess: () => navigate('/dashboard', { replace: true }),
+    loginMutation(data, {
+      onSuccess: (responseData) => {
+        setAuthSession(responseData.access_token)
+        navigate('/dashboard', { replace: true })
+      },
     })
   }
 
