@@ -12,7 +12,7 @@ dist
 dist-ssr
 *.local
 
-# Variables de entorno (no subir al repo)
+# Variables de entorno 
 .env
 .env.local
 .env.*.local
