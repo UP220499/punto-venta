@@ -59,10 +59,16 @@ export function ProductFormModal({ isOpen, product, onClose }) {
   const { mutate: doUpdate, isPending: updating, error: updateErr } = useUpdateProduct()
   const isPending = creating || updating
 
-  const serverError =
-    createErr?.response?.data?.error?.message ??
-    updateErr?.response?.data?.error?.message ??
-    null
+  function extractServerError(err) {
+    if (!err) return null
+    return (
+      err.response?.data?.message ??
+      err.response?.data?.error?.message ??
+      err.message ??
+      null
+    )
+  }
+  const serverError = extractServerError(createErr) ?? extractServerError(updateErr)
 
   const {
     register,
