@@ -5,6 +5,7 @@ import { PublicRoute } from './PublicRoute'
 import { AuthLayout } from '../components/layout/AuthLayout'
 import { LoginPage } from '../pages/login/LoginPage'
 import { DashboardPage } from '../pages/dashboard/DashboardPage'
+import { ProductsPage } from '../pages/products/ProductsPage'
 
 // Redirección reactiva: responde al estado de auth en tiempo real
 function RootRedirect() {
@@ -30,6 +31,7 @@ const router = createBrowserRouter([
         element: <AuthLayout />,
         children: [
           { path: '/dashboard', element: <DashboardPage /> },
+          { path: '/products', element: <ProductsPage /> },
           // Agregar nuevas rutas aquí dentro de AuthLayout
         ],
       },
