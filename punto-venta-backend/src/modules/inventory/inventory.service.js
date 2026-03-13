@@ -73,9 +73,9 @@ async function applyAdjustments(businessId, userId, items) {
 
       if (newStock < 0) {
         throw appError(
-          'STOCK_NEGATIVE_NOT_ALLOWED',
-          `Adjustment would leave product_id=${item.product_id} with negative stock (${prevStock} + ${item.qty_delta} = ${newStock})`,
-          409
+          'INSUFFICIENT_STOCK',
+          `Stock insuficiente. Actual: ${prevStock}, resultado sería: ${newStock}`,
+          422
         );
       }
 
