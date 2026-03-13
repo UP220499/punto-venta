@@ -10,5 +10,10 @@ export function useCreateAdjustment() {
       queryClient.invalidateQueries({ queryKey: ['inventory', 'movements'] })
       queryClient.invalidateQueries({ queryKey: ['products'] })
     },
+    onError: () => {
+      // Refresh products so the live stock preview reflects reality after a
+      // backend rejection (e.g. 422 INSUFFICIENT_STOCK due to race condition)
+      queryClient.invalidateQueries({ queryKey: ['products'] })
+    },
   })
 }

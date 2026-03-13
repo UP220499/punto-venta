@@ -46,6 +46,22 @@ function extractServerError(err) {
   )
 }
 
+// Maps backend INSUFFICIENT_STOCK (English, technical) to a clean Spanish message.
+// Parses numbers from the pattern "(actual + delta = result)" in the raw message.
+function formatAdjustmentError(err) {
+  if (!err) return null
+  const code = err.response?.data?.error?.code
+  if (code === 'INSUFFICIENT_STOCK') {
+    const raw = err.response?.data?.error?.message ?? ''
+    const match = raw.match(/\((\d+(?:\.\d+)?)\s*\+\s*(-?\d+(?:\.\d+)?)\s*=\s*(-?\d+(?:\.\d+)?)\)/)
+    if (match) {
+      return `Stock insuficiente. Actual: ${match[1]}, resultado sería: ${match[3]}.`
+    }
+    return 'Stock insuficiente. El ajuste dejaría el stock en negativo.'
+  }
+  return extractServerError(err)
+}
+
 /* ── component ─────────────────────────────────────────── */
 
 // movementType: 'ENTRADA' | 'AJUSTE'
@@ -59,7 +75,7 @@ export function MovementModal({ isOpen, movementType = 'ENTRADA', products = [],
   const { mutate: doAdjustment, isPending: adjPending, error: adjErr } = useCreateAdjustment()
   const isPending = entryPending || adjPending
 
-  const serverError = extractServerError(entryErr) ?? extractServerError(adjErr)
+  const serverError = extractServerError(entryErr) ?? formatAdjustmentError(adjErr)
 
   const {
     register,
