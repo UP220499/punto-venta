@@ -28,3 +28,24 @@ export async function listPaymentMethods() {
   const { data } = await api.get('/payment-methods')
   return data
 }
+
+/**
+ * GET /tickets
+ * Query: { page?, page_size?, estatus?: 'BORRADOR'|'CERRADO', folio?: number, from?: 'yyyy-mm-dd', to?: 'yyyy-mm-dd' }
+ * Response: { items: [{ ticket_id, folio, estatus, created_at, closed_at, subtotal, impuestos_total, total, cambio }], page, page_size, total }
+ */
+export async function listTickets(params) {
+  const { data } = await api.get('/tickets', { params })
+  return data
+}
+
+/**
+ * GET /tickets/:ticket_id
+ * Response: { ticket: { ticket_id, folio, estatus, created_at, closed_at, subtotal, descuento_total, impuestos_total, total, cambio },
+ *             items:   [{ item_id, product_id, cantidad, precio_unitario, subtotal_linea, product_sku_snapshot, product_nombre_snapshot }],
+ *             payments:[{ payment_id, method_code, method_name, monto, referencia }] }
+ */
+export async function getTicket(ticketId) {
+  const { data } = await api.get(`/tickets/${ticketId}`)
+  return data
+}

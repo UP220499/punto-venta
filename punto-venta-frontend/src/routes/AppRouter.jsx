@@ -8,6 +8,7 @@ import { DashboardPage } from '../pages/dashboard/DashboardPage'
 import { ProductsPage } from '../pages/products/ProductsPage'
 import { InventoryPage } from '../pages/inventory/InventoryPage'
 import { SalesPage } from '../pages/sales/SalesPage'
+import { TicketsHistoryPage } from '../pages/tickets/TicketsHistoryPage'
 
 // Redirección reactiva: responde al estado de auth en tiempo real
 function RootRedirect() {
@@ -36,6 +37,7 @@ const router = createBrowserRouter([
           { path: '/products', element: <ProductsPage /> },
           { path: '/inventory', element: <InventoryPage /> },
           { path: '/sales', element: <SalesPage /> },
+          { path: '/tickets', element: <TicketsHistoryPage /> },
           // Agregar nuevas rutas aquí dentro de AuthLayout
         ],
       },
