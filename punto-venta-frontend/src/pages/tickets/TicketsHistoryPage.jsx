@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useTickets } from '../../features/sales/useTickets'
 import { TicketDetailModal } from './TicketDetailModal'
 
@@ -113,16 +113,26 @@ function EmptyState({ hasFilters, onClearFilters }) {
 export function TicketsHistoryPage() {
   const [page, setPage] = useState(1)
   const [folioInput, setFolioInput] = useState('')
+  const [debouncedFolio, setDebouncedFolio] = useState('')
   const [estatusFilter, setEstatusFilter] = useState('')
   const [fromDate, setFromDate] = useState('')
   const [toDate, setToDate] = useState('')
   const [selectedTicketId, setSelectedTicketId] = useState(null)
 
+  // Debounce folio input — resets page after 400 ms of inactivity
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedFolio(folioInput)
+      setPage(1)
+    }, 400)
+    return () => clearTimeout(timer)
+  }, [folioInput])
+
   const { data, isLoading, isError, error } = useTickets({
     page,
     pageSize: PAGE_SIZE,
     estatus: estatusFilter,
-    folio: folioInput,
+    folio: debouncedFolio,
     from: fromDate,
     to: toDate,
   })
@@ -149,6 +159,7 @@ export function TicketsHistoryPage() {
 
   function clearFilters() {
     setFolioInput('')
+    setDebouncedFolio('')
     setEstatusFilter('')
     setFromDate('')
     setToDate('')
@@ -174,7 +185,7 @@ export function TicketsHistoryPage() {
             min={1}
             placeholder="Ej: 42"
             value={folioInput}
-            onChange={(e) => changeFilter(setFolioInput)(e.target.value)}
+            onChange={(e) => setFolioInput(e.target.value)}
             className="w-28 px-3 py-2 rounded-lg border border-gray-300 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
           />
         </div>
