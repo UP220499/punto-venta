@@ -1,1 +1,18 @@
 @import "tailwindcss";
+
+/* ── Print styles ─────────────────────────────────────── */
+.ticket-print { display: none; }
+
+@media print {
+  * { visibility: hidden; }
+  .ticket-print {
+    display: block;
+    visibility: visible;
+    position: fixed;
+    inset: 0;
+    padding: 20px;
+    background: white;
+  }
+  .ticket-print * { visibility: visible; }
+  @page { margin: 10mm; }
+}
