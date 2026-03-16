@@ -1,4 +1,5 @@
 import { useTicketDetail } from '../../features/sales/useTicketDetail'
+import { TicketPrintView } from './TicketPrintView'
 
 /* ── formatters ──────────────────────────────────────────── */
 
@@ -75,6 +76,10 @@ export function TicketDetailModal({ ticketId, onClose }) {
   const payments = data?.payments ?? []
 
   return (
+    <>
+    {/* Print-only receipt — hidden on screen, visible at @media print */}
+    {ticket && <TicketPrintView ticket={ticket} items={items} payments={payments} />}
+
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       {/* Backdrop */}
       <div className="fixed inset-0 bg-black/50" onClick={onClose} />
@@ -241,16 +246,36 @@ export function TicketDetailModal({ ticketId, onClose }) {
 
         {/* Footer */}
         <div className="shrink-0 px-6 py-4 border-t border-gray-200">
-          <button
-            type="button"
-            onClick={onClose}
-            className="w-full py-2.5 rounded-xl border border-gray-300 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
-          >
-            Cerrar
-          </button>
+          {ticket ? (
+            <div className="flex gap-3">
+              <button
+                type="button"
+                onClick={() => window.print()}
+                className="flex-1 py-2.5 rounded-xl bg-indigo-600 text-sm font-medium text-white hover:bg-indigo-700 transition-colors"
+              >
+                Imprimir
+              </button>
+              <button
+                type="button"
+                onClick={onClose}
+                className="flex-1 py-2.5 rounded-xl border border-gray-300 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+              >
+                Cerrar
+              </button>
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={onClose}
+              className="w-full py-2.5 rounded-xl border border-gray-300 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+            >
+              Cerrar
+            </button>
+          )}
         </div>
 
       </div>
     </div>
+    </>
   )
 }
