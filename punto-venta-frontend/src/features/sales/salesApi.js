@@ -19,3 +19,12 @@ export async function closeTicket(ticketId, body) {
   const { data } = await api.post(`/tickets/${ticketId}/close`, body)
   return data
 }
+
+/**
+ * GET /payment-methods
+ * Response: { items: [{ payment_method_id, code, nombre_visible, estatus, sort_order, requires_reference, allows_change }] }
+ */
+export async function listPaymentMethods() {
+  const { data } = await api.get('/payment-methods')
+  return data
+}

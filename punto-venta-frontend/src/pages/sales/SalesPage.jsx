@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect, useRef } from 'react'
 import { useProducts } from '../../features/products/useProducts'
 import { useTicket } from '../../features/sales/useTicket'
+import { CheckoutModal } from './CheckoutModal'
 
 /* ── currency formatter ──────────────────────────────────── */
 
@@ -274,7 +275,7 @@ function TicketItem({ item, onSetQuantity, onRemove }) {
 
 /* ── ticket panel (right) ────────────────────────────────── */
 
-function TicketPanel({ items, subtotal, total, onSetQuantity, onRemove, onClear, onCobrar, checkoutHint }) {
+function TicketPanel({ items, subtotal, total, onSetQuantity, onRemove, onClear, onCobrar }) {
   const isEmpty = items.length === 0
 
   return (
@@ -366,14 +367,6 @@ function TicketPanel({ items, subtotal, total, onSetQuantity, onRemove, onClear,
             Cobrar · {fmt(total)}
           </button>
 
-          {/* Next-phase placeholder */}
-          {checkoutHint && (
-            <div className="mt-3 p-3 bg-indigo-50 border border-indigo-200 rounded-lg">
-              <p className="text-xs text-indigo-700 text-center leading-relaxed">
-                El cobro con selección de método de pago estará disponible en la siguiente fase.
-              </p>
-            </div>
-          )}
         </div>
       </div>
     </div>
@@ -389,8 +382,7 @@ export function SalesPage() {
   const [stockAlert, setStockAlert] = useState(null)
   const stockAlertTimer = useRef(null)
 
-  // Checkout placeholder (next phase)
-  const [checkoutHint, setCheckoutHint] = useState(false)
+  const [isCheckoutOpen, setIsCheckoutOpen] = useState(false)
 
   function showStockAlert(nombre, available) {
     clearTimeout(stockAlertTimer.current)
@@ -405,7 +397,6 @@ export function SalesPage() {
     } else {
       clearTimeout(stockAlertTimer.current)
       setStockAlert(null)
-      setCheckoutHint(false)
     }
   }
 
@@ -418,12 +409,12 @@ export function SalesPage() {
   }
 
   function handleCobrar() {
-    // TODO (next phase): open payment modal → POST /tickets → POST /tickets/:id/close
-    setCheckoutHint(true)
+    setIsCheckoutOpen(true)
   }
 
   return (
-    <div className="flex gap-4 h-full">
+    <>
+      <div className="flex gap-4 h-full">
       {/* Left: product search */}
       <div className="flex-1 min-w-0 flex flex-col min-h-0">
         <ProductSearchPanel
@@ -443,13 +434,20 @@ export function SalesPage() {
           onRemove={ticket.removeItem}
           onClear={() => {
             ticket.clearTicket()
-            setCheckoutHint(false)
             setStockAlert(null)
           }}
           onCobrar={handleCobrar}
-          checkoutHint={checkoutHint}
         />
       </div>
     </div>
+
+    <CheckoutModal
+      isOpen={isCheckoutOpen}
+      total={ticket.total}
+      cartItems={ticket.items}
+      onClose={() => setIsCheckoutOpen(false)}
+      onSuccess={ticket.clearTicket}
+    />
+    </>
   )
 }
