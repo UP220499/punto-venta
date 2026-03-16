@@ -2,6 +2,7 @@ import { useState, useMemo, useEffect, useRef } from 'react'
 import { useProducts } from '../../features/products/useProducts'
 import { useTicket } from '../../features/sales/useTicket'
 import { CheckoutModal } from './CheckoutModal'
+import { usePermission, PERMISSIONS } from '../../lib/permissions'
 
 /* ── currency formatter ──────────────────────────────────── */
 
@@ -356,18 +357,19 @@ function TicketPanel({ items, subtotal, total, onSetQuantity, onRemove, onClear,
           </div>
         </div>
 
-        {/* Cobrar button */}
-        <div className="px-4 pb-4">
-          <button
-            type="button"
-            onClick={onCobrar}
-            disabled={isEmpty}
-            className="w-full py-3 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white font-bold rounded-xl transition-colors disabled:opacity-40 disabled:cursor-not-allowed text-sm tracking-wide"
-          >
-            Cobrar · {fmt(total)}
-          </button>
-
-        </div>
+        {/* Cobrar button — only rendered when user has SALE_CLOSE permission */}
+        {onCobrar && (
+          <div className="px-4 pb-4">
+            <button
+              type="button"
+              onClick={onCobrar}
+              disabled={isEmpty}
+              className="w-full py-3 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white font-bold rounded-xl transition-colors disabled:opacity-40 disabled:cursor-not-allowed text-sm tracking-wide"
+            >
+              Cobrar · {fmt(total)}
+            </button>
+          </div>
+        )}
       </div>
     </div>
   )
@@ -377,6 +379,7 @@ function TicketPanel({ items, subtotal, total, onSetQuantity, onRemove, onClear,
 
 export function SalesPage() {
   const ticket = useTicket()
+  const canClose = usePermission(PERMISSIONS.SALE_CLOSE)
 
   // Stock alert: { nombre, available } | null
   const [stockAlert, setStockAlert] = useState(null)
@@ -436,7 +439,7 @@ export function SalesPage() {
             ticket.clearTicket()
             setStockAlert(null)
           }}
-          onCobrar={handleCobrar}
+          onCobrar={canClose ? handleCobrar : undefined}
         />
       </div>
     </div>

@@ -2,6 +2,8 @@ import { createBrowserRouter, RouterProvider, Navigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { ProtectedRoute } from './ProtectedRoute'
 import { PublicRoute } from './PublicRoute'
+import { RequirePermission } from './RequirePermission'
+import { PERMISSIONS } from '../lib/permissions'
 import { AuthLayout } from '../components/layout/AuthLayout'
 import { LoginPage } from '../pages/login/LoginPage'
 import { DashboardPage } from '../pages/dashboard/DashboardPage'
@@ -34,10 +36,10 @@ const router = createBrowserRouter([
         element: <AuthLayout />,
         children: [
           { path: '/dashboard', element: <DashboardPage /> },
-          { path: '/products', element: <ProductsPage /> },
-          { path: '/inventory', element: <InventoryPage /> },
-          { path: '/sales', element: <SalesPage /> },
-          { path: '/tickets', element: <TicketsHistoryPage /> },
+          { path: '/products',  element: <RequirePermission code={PERMISSIONS.PRODUCT_READ}><ProductsPage /></RequirePermission> },
+          { path: '/inventory', element: <RequirePermission code={PERMISSIONS.INVENTORY_READ}><InventoryPage /></RequirePermission> },
+          { path: '/sales',     element: <RequirePermission code={PERMISSIONS.SALE_CREATE}><SalesPage /></RequirePermission> },
+          { path: '/tickets',   element: <RequirePermission code={PERMISSIONS.SALE_CLOSE}><TicketsHistoryPage /></RequirePermission> },
           // Agregar nuevas rutas aquí dentro de AuthLayout
         ],
       },

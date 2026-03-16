@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react'
 import { useMovements } from '../../features/inventory/useMovements'
 import { useProducts } from '../../features/products/useProducts'
 import { MovementModal } from './MovementModal'
+import { usePermission, PERMISSIONS } from '../../lib/permissions'
 
 /* ── formatters ────────────────────────────────────────── */
 
@@ -214,6 +215,8 @@ export function InventoryPage() {
     setModalType(null)
   }
 
+  const canWrite = usePermission(PERMISSIONS.INVENTORY_WRITE)
+
   const hasFilters = !!(tipoFilter || productFilter || fromDate || toDate)
   const errorMessage =
     error?.response?.data?.error?.message ??
@@ -232,26 +235,28 @@ export function InventoryPage() {
             Historial de movimientos y ajustes de stock
           </p>
         </div>
-        <div className="flex items-center gap-2 shrink-0">
-          <button
-            onClick={openAdjustment}
-            className="flex items-center gap-2 px-4 py-2.5 bg-white hover:bg-gray-50 text-indigo-600 text-sm font-semibold rounded-xl border border-indigo-200 shadow-sm transition-colors"
-          >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
-            </svg>
-            Ajuste manual
-          </button>
-          <button
-            onClick={openEntry}
-            className="flex items-center gap-2 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold rounded-xl shadow-sm transition-colors"
-          >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-            </svg>
-            Nueva entrada
-          </button>
-        </div>
+        {canWrite && (
+          <div className="flex items-center gap-2 shrink-0">
+            <button
+              onClick={openAdjustment}
+              className="flex items-center gap-2 px-4 py-2.5 bg-white hover:bg-gray-50 text-indigo-600 text-sm font-semibold rounded-xl border border-indigo-200 shadow-sm transition-colors"
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
+              </svg>
+              Ajuste manual
+            </button>
+            <button
+              onClick={openEntry}
+              className="flex items-center gap-2 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold rounded-xl shadow-sm transition-colors"
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+              </svg>
+              Nueva entrada
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Filters */}

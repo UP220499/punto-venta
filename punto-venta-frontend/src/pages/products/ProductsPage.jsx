@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useProducts } from '../../features/products/useProducts'
 import { ProductFormModal } from './ProductFormModal'
+import { usePermission, PERMISSIONS } from '../../lib/permissions'
 
 /* ── formatters ────────────────────────────────────────── */
 
@@ -88,18 +89,20 @@ function EmptyState({ hasFilters, onClearFilters, onAdd }) {
       ) : (
         <>
           <p className="text-sm font-medium text-gray-700">Sin productos</p>
-          <p className="text-xs text-gray-400 mt-1 mb-4">
+          <p className={`text-xs text-gray-400 mt-1 ${onAdd ? 'mb-4' : ''}`}>
             Aún no hay productos registrados en el catálogo
           </p>
-          <button
-            onClick={onAdd}
-            className="flex items-center gap-1.5 text-sm text-indigo-600 hover:text-indigo-800 font-medium transition-colors"
-          >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-            </svg>
-            Agregar primer producto
-          </button>
+          {onAdd && (
+            <button
+              onClick={onAdd}
+              className="flex items-center gap-1.5 text-sm text-indigo-600 hover:text-indigo-800 font-medium transition-colors"
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+              </svg>
+              Agregar primer producto
+            </button>
+          )}
         </>
       )}
     </div>
@@ -166,9 +169,11 @@ export function ProductsPage() {
     setSelectedProduct(null)
   }
 
+  const canWrite = usePermission(PERMISSIONS.PRODUCT_WRITE)
+
   const hasFilters = !!(debouncedSearch || statusFilter)
   const errorMessage =
-    error?.response?.data?.error?.message ?? error?.message ?? 'Error al cargar productos'
+    error?.response?.data?.message ?? error?.message ?? 'Error al cargar productos'
 
   return (
     <div className="space-y-6 max-w-7xl">
@@ -181,15 +186,17 @@ export function ProductsPage() {
             Catálogo de productos del negocio
           </p>
         </div>
-        <button
-          onClick={openCreate}
-          className="flex items-center gap-2 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-xl shadow-sm transition-colors shrink-0"
-        >
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-          </svg>
-          Nuevo producto
-        </button>
+        {canWrite && (
+          <button
+            onClick={openCreate}
+            className="flex items-center gap-2 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-xl shadow-sm transition-colors shrink-0"
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+            </svg>
+            Nuevo producto
+          </button>
+        )}
       </div>
 
       {/* Filters */}
@@ -253,7 +260,7 @@ export function ProductsPage() {
           <EmptyState
             hasFilters={hasFilters}
             onClearFilters={clearFilters}
-            onAdd={openCreate}
+            onAdd={canWrite ? openCreate : null}
           />
         ) : (
           <>
@@ -315,15 +322,17 @@ export function ProductsPage() {
                         <StatusBadge estatus={product.estatus} />
                       </td>
                       <td className="px-6 py-4 text-right whitespace-nowrap">
-                        <button
-                          onClick={() => openEdit(product)}
-                          title="Editar producto"
-                          className="p-1.5 rounded-lg text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 transition-colors"
-                        >
-                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-4 h-4">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
-                          </svg>
-                        </button>
+                        {canWrite && (
+                          <button
+                            onClick={() => openEdit(product)}
+                            title="Editar producto"
+                            className="p-1.5 rounded-lg text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 transition-colors"
+                          >
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-4 h-4">
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
+                            </svg>
+                          </button>
+                        )}
                       </td>
                     </tr>
                   ))}
