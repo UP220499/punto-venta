@@ -11,6 +11,7 @@ import { ProductsPage } from '../pages/products/ProductsPage'
 import { InventoryPage } from '../pages/inventory/InventoryPage'
 import { SalesPage } from '../pages/sales/SalesPage'
 import { TicketsHistoryPage } from '../pages/tickets/TicketsHistoryPage'
+import { UsersPage } from '../pages/users/UsersPage'
 
 // Redirección reactiva: responde al estado de auth en tiempo real
 function RootRedirect() {
@@ -40,6 +41,7 @@ const router = createBrowserRouter([
           { path: '/inventory', element: <RequirePermission code={PERMISSIONS.INVENTORY_READ}><InventoryPage /></RequirePermission> },
           { path: '/sales',     element: <RequirePermission code={PERMISSIONS.SALE_CREATE}><SalesPage /></RequirePermission> },
           { path: '/tickets',   element: <RequirePermission code={PERMISSIONS.SALE_CLOSE}><TicketsHistoryPage /></RequirePermission> },
+          { path: '/users',     element: <RequirePermission code={PERMISSIONS.USER_READ}><UsersPage /></RequirePermission> },
           // Agregar nuevas rutas aquí dentro de AuthLayout
         ],
       },
