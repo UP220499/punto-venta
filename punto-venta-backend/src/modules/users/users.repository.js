@@ -113,7 +113,7 @@ async function updatePassword(userId, passwordHash) {
 async function setUserRoles(userId, roleIds) {
   return knex.transaction(async (trx) => {
     await trx('user_role').where({ user_id: userId }).delete();
-    await trx('user_role').insert(roleIds.map((role_id) => ({ user_id, role_id })));
+    await trx('user_role').insert(roleIds.map((role_id) => ({ user_id: userId, role_id })));
   });
 }
 
