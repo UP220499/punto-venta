@@ -12,6 +12,8 @@ export const PERMISSIONS = {
   SALE_CREATE:     'SALE_CREATE',
   SALE_CLOSE:      'SALE_CLOSE',
   REPORT_READ:     'REPORT_READ',
+  USER_READ:       'USER_READ',
+  USER_WRITE:      'USER_WRITE',
 }
 
 /**
