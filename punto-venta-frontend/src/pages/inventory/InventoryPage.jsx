@@ -9,6 +9,7 @@ import { usePermission, PERMISSIONS } from '../../lib/permissions'
 const dateFormatter = new Intl.DateTimeFormat('es-MX', {
   dateStyle: 'short',
   timeStyle: 'short',
+  timeZone: 'UTC',
 })
 function formatDate(iso) {
   try {
