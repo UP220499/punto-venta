@@ -5,18 +5,20 @@ import { useAuth } from '../contexts/AuthContext'
  * Update here if the backend changes its permission strings.
  */
 export const PERMISSIONS = {
-  PRODUCT_READ:    'PRODUCT_READ',
-  PRODUCT_WRITE:   'PRODUCT_WRITE',
-  INVENTORY_READ:  'INVENTORY_READ',
-  INVENTORY_WRITE: 'INVENTORY_WRITE',
-  SALE_CREATE:     'SALE_CREATE',
-  SALE_VIEW:       'SALE_VIEW',
-  SALE_CLOSE:      'SALE_CLOSE',
-  REPORT_READ:     'REPORT_READ',
-  USER_READ:       'USER_READ',
-  USER_WRITE:      'USER_WRITE',
-  ROLE_READ:       'ROLE_READ',
-  ROLE_WRITE:      'ROLE_WRITE',
+  PRODUCT_READ:         'PRODUCT_READ',
+  PRODUCT_WRITE:        'PRODUCT_WRITE',
+  INVENTORY_READ:       'INVENTORY_READ',
+  INVENTORY_WRITE:      'INVENTORY_WRITE',
+  SALE_CREATE:          'SALE_CREATE',
+  SALE_VIEW:            'SALE_VIEW',
+  SALE_CLOSE:           'SALE_CLOSE',
+  REPORT_READ:          'REPORT_READ',
+  USER_READ:            'USER_READ',
+  USER_WRITE:           'USER_WRITE',
+  ROLE_READ:            'ROLE_READ',
+  ROLE_WRITE:           'ROLE_WRITE',
+  PAYMENT_METHOD_READ:  'PAYMENT_METHOD_READ',
+  PAYMENT_METHOD_WRITE: 'PAYMENT_METHOD_WRITE',
 }
 
 /**

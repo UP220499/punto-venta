@@ -166,7 +166,7 @@ function PaymentScreen({ total, isPending, serverError, onSubmit, onClose }) {
   return (
     <>
       {/* Header */}
-      <div className="flex items-center justify-between px-6 py-5 border-b border-gray-200">
+      <div className="shrink-0 flex items-center justify-between px-6 py-5 border-b border-gray-200">
         <div>
           <h2 className="text-lg font-semibold text-gray-900">Cobro de venta</h2>
           <p className="text-sm text-gray-500 mt-0.5">Registra el pago para cerrar el ticket</p>
@@ -182,7 +182,7 @@ function PaymentScreen({ total, isPending, serverError, onSubmit, onClose }) {
         </button>
       </div>
 
-      <div className="px-6 py-5 space-y-5">
+      <div className="flex-1 min-h-0 overflow-y-auto px-6 py-5 space-y-5">
         {/* Total to pay */}
         <div className="text-center py-3 bg-indigo-50 rounded-xl border border-indigo-100">
           <p className="text-xs font-semibold text-indigo-500 uppercase tracking-wider mb-1">Total a cobrar</p>
@@ -305,7 +305,7 @@ function PaymentScreen({ total, isPending, serverError, onSubmit, onClose }) {
       </div>
 
       {/* Footer */}
-      <div className="px-6 pb-6">
+      <div className="shrink-0 px-6 pb-6 pt-3 border-t border-gray-100 bg-white">
         <button
           type="button"
           onClick={handleSubmit}
@@ -382,7 +382,7 @@ export function CheckoutModal({ isOpen, total, cartItems, onClose, onSuccess }) 
       />
 
       {/* Panel */}
-      <div className="relative bg-white rounded-2xl shadow-xl w-full max-w-sm z-10 overflow-hidden">
+      <div className="relative bg-white rounded-2xl shadow-xl w-full max-w-sm z-10 overflow-hidden flex flex-col max-h-[calc(100vh-2rem)]">
         {result ? (
           <SuccessScreen result={result} onClose={handleClose} />
         ) : (
