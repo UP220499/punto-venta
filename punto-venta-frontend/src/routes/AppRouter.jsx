@@ -14,6 +14,7 @@ import { TicketsHistoryPage } from '../pages/tickets/TicketsHistoryPage'
 import { UsersPage } from '../pages/users/UsersPage'
 import { RolesPage } from '../pages/roles/RolesPage'
 import { PaymentMethodsPage } from '../pages/payment-methods/PaymentMethodsPage'
+import { ReportsPage } from '../pages/reports/ReportsPage'
 
 // Redirección reactiva: responde al estado de auth en tiempo real
 function RootRedirect() {
@@ -46,6 +47,7 @@ const router = createBrowserRouter([
           { path: '/users',     element: <RequirePermission code={PERMISSIONS.USER_READ}><UsersPage /></RequirePermission> },
           { path: '/roles',            element: <RequirePermission code={PERMISSIONS.ROLE_READ}><RolesPage /></RequirePermission> },
           { path: '/payment-methods', element: <RequirePermission code={PERMISSIONS.PAYMENT_METHOD_READ}><PaymentMethodsPage /></RequirePermission> },
+          { path: '/reports',         element: <RequirePermission code={PERMISSIONS.REPORT_READ}><ReportsPage /></RequirePermission> },
           // Agregar nuevas rutas aquí dentro de AuthLayout
         ],
       },
