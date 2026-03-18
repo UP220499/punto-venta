@@ -2,21 +2,22 @@
 
 const { knex } = require('../../config/db');
 
-function dateRange(from, to) {
-  return {
-    start: from ? `${from}T00:00:00.000Z` : null,
-    end: to ? `${to}T23:59:59.999Z` : null,
-  };
+async function getBusinessTimezone(businessId) {
+  const row = await knex('business_settings')
+    .where({ business_id: businessId })
+    .select('timezone')
+    .first();
+  return (row && row.timezone) || 'UTC';
 }
 
 async function salesSummary(businessId, from, to) {
-  const { start, end } = dateRange(from, to);
+  const tz = await getBusinessTimezone(businessId);
 
   const ticketQuery = knex('sale_ticket')
     .where({ business_id: businessId, estatus: 'CERRADO' });
 
-  if (start) ticketQuery.where('closed_at', '>=', start);
-  if (end) ticketQuery.where('closed_at', '<=', end);
+  if (from) ticketQuery.whereRaw('(closed_at AT TIME ZONE ?)::date >= ?', [tz, from]);
+  if (to)   ticketQuery.whereRaw('(closed_at AT TIME ZONE ?)::date <= ?', [tz, to]);
 
   const ticketStats = await ticketQuery.clone()
     .select(
@@ -34,8 +35,8 @@ async function salesSummary(businessId, from, to) {
     .where('st.business_id', businessId)
     .where('st.estatus', 'CERRADO');
 
-  if (start) paymentQuery.where('st.closed_at', '>=', start);
-  if (end) paymentQuery.where('st.closed_at', '<=', end);
+  if (from) paymentQuery.whereRaw('(st.closed_at AT TIME ZONE ?)::date >= ?', [tz, from]);
+  if (to)   paymentQuery.whereRaw('(st.closed_at AT TIME ZONE ?)::date <= ?', [tz, to]);
 
   const paymentStats = await paymentQuery
     .select(knex.raw('coalesce(sum(sp.monto), 0) as payments_total'))
@@ -51,25 +52,25 @@ async function salesSummary(businessId, from, to) {
 /* ── sales by day ────────────────────────────────────── */
 
 async function salesByDay(businessId, from, to) {
-  const { start, end } = dateRange(from, to);
+  const tz = await getBusinessTimezone(businessId);
 
   return knex('sale_ticket')
     .where({ business_id: businessId, estatus: 'CERRADO' })
-    .where('closed_at', '>=', start)
-    .where('closed_at', '<=', end)
+    .whereRaw('(closed_at AT TIME ZONE ?)::date >= ?', [tz, from])
+    .whereRaw('(closed_at AT TIME ZONE ?)::date <= ?', [tz, to])
     .select(
-      knex.raw("date_trunc('day', closed_at)::date as date"),
+      knex.raw('(closed_at AT TIME ZONE ?)::date as date', [tz]),
       knex.raw('count(*)::int as tickets_count'),
       knex.raw('coalesce(sum(total), 0) as gross_sales')
     )
-    .groupByRaw("date_trunc('day', closed_at)::date")
+    .groupByRaw('(closed_at AT TIME ZONE ?)::date', [tz])
     .orderBy('date', 'asc');
 }
 
 /* ── top products ────────────────────────────────────── */
 
 async function topProducts(businessId, from, to, limit) {
-  const { start, end } = dateRange(from, to);
+  const tz = await getBusinessTimezone(businessId);
 
   return knex('sale_ticket_item as si')
     .join('sale_ticket as st', function () {
@@ -78,8 +79,8 @@ async function topProducts(businessId, from, to, limit) {
     })
     .where('st.business_id', businessId)
     .where('st.estatus', 'CERRADO')
-    .where('st.closed_at', '>=', start)
-    .where('st.closed_at', '<=', end)
+    .whereRaw('(st.closed_at AT TIME ZONE ?)::date >= ?', [tz, from])
+    .whereRaw('(st.closed_at AT TIME ZONE ?)::date <= ?', [tz, to])
     .select(
       'si.product_id',
       'si.product_sku_snapshot as sku',
@@ -95,12 +96,12 @@ async function topProducts(businessId, from, to, limit) {
 /* ── inventory summary ───────────────────────────────── */
 
 async function inventorySummary(businessId, from, to) {
-  const { start, end } = dateRange(from, to);
+  const tz = await getBusinessTimezone(businessId);
 
   const rows = await knex('inventory_movement')
     .where('business_id', businessId)
-    .where('created_at', '>=', start)
-    .where('created_at', '<=', end)
+    .whereRaw('(created_at AT TIME ZONE ?)::date >= ?', [tz, from])
+    .whereRaw('(created_at AT TIME ZONE ?)::date <= ?', [tz, to])
     .select(
       'tipo',
       knex.raw('sum(abs(qty_delta)) as total_qty')
