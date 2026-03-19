@@ -54,17 +54,27 @@ async function salesSummary(businessId, from, to) {
 async function salesByDay(businessId, from, to) {
   const tz = await getBusinessTimezone(businessId);
 
-  return knex('sale_ticket')
+  // Subquery materializes local_date as a real column so the outer query
+  // can GROUP BY / ORDER BY a plain column reference — no repeated raw
+  // expressions, no alias ambiguity, no PostgreSQL 42803 error.
+  const sub = knex('sale_ticket')
     .where({ business_id: businessId, estatus: 'CERRADO' })
     .whereRaw('(closed_at AT TIME ZONE ?)::date >= ?', [tz, from])
     .whereRaw('(closed_at AT TIME ZONE ?)::date <= ?', [tz, to])
     .select(
-      knex.raw('(closed_at AT TIME ZONE ?)::date as date', [tz]),
-      knex.raw('count(*)::int as tickets_count'),
-      knex.raw('coalesce(sum(total), 0) as gross_sales')
+      'total',
+      knex.raw('(closed_at AT TIME ZONE ?)::date as local_date', [tz])
     )
-    .groupByRaw('(closed_at AT TIME ZONE ?)::date', [tz])
-    .orderByRaw('(closed_at AT TIME ZONE ?)::date asc', [tz]);
+    .as('t');
+
+  return knex(sub)
+    .select(
+      't.local_date as date',
+      knex.raw('count(*)::int as tickets_count'),
+      knex.raw('coalesce(sum(t.total), 0) as gross_sales')
+    )
+    .groupBy('t.local_date')
+    .orderBy('t.local_date', 'asc');
 }
 
 /* ── top products ────────────────────────────────────── */
