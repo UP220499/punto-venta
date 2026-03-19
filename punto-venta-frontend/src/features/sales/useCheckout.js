@@ -26,6 +26,8 @@ export function useCheckout() {
     onSuccess: () => {
       // Refresh product stock so the search panel reflects the sold quantities
       queryClient.invalidateQueries({ queryKey: ['products'] })
+      // A closed sale affects all report metrics (sales + inventory)
+      queryClient.invalidateQueries({ queryKey: ['reports'] })
     },
     onError: () => {
       // Refresh stock in case backend updated inventory before rejecting (race condition)
