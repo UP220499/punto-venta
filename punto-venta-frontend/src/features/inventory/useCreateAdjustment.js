@@ -9,6 +9,8 @@ export function useCreateAdjustment() {
       // Refresh movements list + products (stock_actual changes)
       queryClient.invalidateQueries({ queryKey: ['inventory', 'movements'] })
       queryClient.invalidateQueries({ queryKey: ['products'] })
+      // Adjustment affects the inventory summary report
+      queryClient.invalidateQueries({ queryKey: ['reports', 'inventory-summary'] })
     },
     onError: () => {
       // Refresh products so the live stock preview reflects reality after a
