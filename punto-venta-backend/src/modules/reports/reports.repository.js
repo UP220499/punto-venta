@@ -64,7 +64,7 @@ async function salesByDay(businessId, from, to) {
       knex.raw('coalesce(sum(total), 0) as gross_sales')
     )
     .groupByRaw('(closed_at AT TIME ZONE ?)::date', [tz])
-    .orderBy('date', 'asc');
+    .orderByRaw('(closed_at AT TIME ZONE ?)::date asc', [tz]);
 }
 
 /* ── top products ────────────────────────────────────── */
