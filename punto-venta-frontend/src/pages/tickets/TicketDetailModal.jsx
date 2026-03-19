@@ -1,4 +1,5 @@
 import { useTicketDetail } from '../../features/sales/useTicketDetail'
+import { useSettings } from '../../features/settings/useSettings'
 import { TicketPrintView } from './TicketPrintView'
 
 /* ── formatters ──────────────────────────────────────────── */
@@ -68,6 +69,7 @@ function EstatusBadge({ estatus }) {
  */
 export function TicketDetailModal({ ticketId, onClose }) {
   const { data, isLoading, isError } = useTicketDetail(ticketId)
+  const { data: settings } = useSettings()
 
   if (ticketId == null) return null
 
@@ -78,7 +80,15 @@ export function TicketDetailModal({ ticketId, onClose }) {
   return (
     <>
     {/* Print-only receipt — hidden on screen, visible at @media print */}
-    {ticket && <TicketPrintView ticket={ticket} items={items} payments={payments} />}
+    {ticket && (
+      <TicketPrintView
+        ticket={ticket}
+        items={items}
+        payments={payments}
+        headerText={settings?.ticket_header_text || null}
+        footerText={settings?.ticket_footer_text || null}
+      />
+    )}
 
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       {/* Backdrop */}
