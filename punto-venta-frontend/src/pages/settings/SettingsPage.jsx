@@ -219,7 +219,7 @@ export function SettingsPage() {
           {/* 1 — Información general */}
           <Section title="Información general">
             <div className="grid grid-cols-2 gap-x-6 gap-y-4">
-              <Field label="Zona horaria" error={errors.timezone?.message}>
+              <Field label="Zona horaria" hint="Nombre IANA, ej: America/Mexico_City" error={errors.timezone?.message}>
                 <input
                   {...register('timezone')}
                   disabled={disabled}
@@ -275,6 +275,12 @@ export function SettingsPage() {
                   disabled={disabled}
                   className={inputCls}
                 />
+                <div className="mt-1.5 flex items-start gap-1.5">
+                  <svg className="w-3.5 h-3.5 text-amber-500 shrink-0 mt-0.5" viewBox="0 0 24 24" fill="currentColor">
+                    <path fillRule="evenodd" d="M9.401 3.003c1.155-2 4.043-2 5.197 0l7.355 12.748c1.154 2-.29 4.5-2.599 4.5H4.645c-2.309 0-3.752-2.5-2.598-4.5L9.4 3.003zM12 8.25a.75.75 0 01.75.75v3.75a.75.75 0 01-1.5 0V9a.75.75 0 01.75-.75zm0 8.25a.75.75 0 100-1.5.75.75 0 000 1.5z" clipRule="evenodd" />
+                  </svg>
+                  <p className="text-xs text-amber-700">Reducir este valor puede generar folios duplicados si ya existen tickets con números mayores.</p>
+                </div>
               </Field>
               <Field label="Dígitos (padding)" hint="0–12, rellena con ceros" error={errors.ticket_folio_padding?.message}>
                 <input
