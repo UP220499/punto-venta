@@ -5,15 +5,7 @@ import { z } from 'zod'
 import { useQueryClient } from '@tanstack/react-query'
 import { useCreateUser } from '../../features/users/useCreateUser'
 import { updateUser, setUserRoles } from '../../features/users/usersApi'
-
-/* ── constants ──────────────────────────────────────────── */
-
-// Known role codes — update if backend adds new roles
-const ROLE_OPTIONS = [
-  { code: 'ADMIN',      label: 'Administrador' },
-  { code: 'CAJERO',     label: 'Cajero' },
-  { code: 'INVENTARIO', label: 'Inventario' },
-]
+import { useRoles } from '../../features/roles/useRoles'
 
 /* ── schemas ────────────────────────────────────────────── */
 
@@ -57,6 +49,8 @@ function extractError(err) {
 export function UserFormModal({ isOpen, user, onClose }) {
   const isEdit = user != null
   const qc = useQueryClient()
+
+  const { data: rolesData = [], isLoading: rolesLoading } = useRoles()
 
   const { mutate: doCreate, isPending: creating, error: createErr } = useCreateUser()
 
@@ -241,25 +235,33 @@ export function UserFormModal({ isOpen, user, onClose }) {
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Roles <span className="text-red-500">*</span>
               </label>
-              <div className="space-y-2">
-                {ROLE_OPTIONS.map((opt) => (
-                  <label
-                    key={opt.code}
-                    className="flex items-center gap-3 p-3 rounded-lg border border-gray-200 hover:border-indigo-300 hover:bg-indigo-50/40 cursor-pointer transition-colors"
-                  >
-                    <input
-                      type="checkbox"
-                      checked={roleCodes.includes(opt.code)}
-                      onChange={() => toggleRole(opt.code)}
-                      className="w-4 h-4 rounded text-indigo-600 border-gray-300 focus:ring-indigo-500"
-                    />
-                    <div>
-                      <p className="text-sm font-medium text-gray-800">{opt.label}</p>
-                      <p className="text-xs text-gray-400">{opt.code}</p>
-                    </div>
-                  </label>
-                ))}
-              </div>
+              {rolesLoading ? (
+                <div className="space-y-2">
+                  {[1, 2, 3].map((i) => (
+                    <div key={i} className="h-14 animate-pulse bg-gray-100 rounded-lg" />
+                  ))}
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {rolesData.map((role) => (
+                    <label
+                      key={role.code}
+                      className="flex items-center gap-3 p-3 rounded-lg border border-gray-200 hover:border-indigo-300 hover:bg-indigo-50/40 cursor-pointer transition-colors"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={roleCodes.includes(role.code)}
+                        onChange={() => toggleRole(role.code)}
+                        className="w-4 h-4 rounded text-indigo-600 border-gray-300 focus:ring-indigo-500"
+                      />
+                      <div>
+                        <p className="text-sm font-medium text-gray-800">{role.nombre}</p>
+                        <p className="text-xs text-gray-400">{role.code}</p>
+                      </div>
+                    </label>
+                  ))}
+                </div>
+              )}
               {errors.role_codes && <FieldError msg={errors.role_codes.message} />}
             </div>
 

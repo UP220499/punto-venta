@@ -5,7 +5,7 @@ const KPI_CARDS = [
   {
     title: 'Ventas hoy',
     value: '—',
-    note: 'Pendiente de conectar',
+    note: 'Ver en Reportes',
     color: 'indigo',
     icon: (
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-5 h-5">
@@ -16,7 +16,7 @@ const KPI_CARDS = [
   {
     title: 'Tickets abiertos',
     value: '—',
-    note: 'Pendiente de conectar',
+    note: 'Ver en Historial de ventas',
     color: 'emerald',
     icon: (
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-5 h-5">
@@ -27,7 +27,7 @@ const KPI_CARDS = [
   {
     title: 'Productos activos',
     value: '—',
-    note: 'Pendiente de conectar',
+    note: 'Ver en Productos',
     color: 'amber',
     icon: (
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-5 h-5">
@@ -38,7 +38,7 @@ const KPI_CARDS = [
   {
     title: 'Usuarios activos',
     value: '—',
-    note: 'Pendiente de conectar',
+    note: 'Ver en Usuarios',
     color: 'sky',
     icon: (
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-5 h-5">

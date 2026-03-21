@@ -87,6 +87,7 @@ export function TicketDetailModal({ ticketId, onClose }) {
         payments={payments}
         headerText={settings?.ticket_header_text || null}
         footerText={settings?.ticket_footer_text || null}
+        folioPadding={settings?.ticket_folio_padding ?? 4}
       />
     )}
 
@@ -103,7 +104,7 @@ export function TicketDetailModal({ ticketId, onClose }) {
             <h2 className="text-lg font-bold text-gray-900 truncate">
               {ticket
                 ? ticket.folio != null
-                  ? `Ticket #${String(ticket.folio).padStart(4, '0')}`
+                  ? `Ticket #${String(ticket.folio).padStart(settings?.ticket_folio_padding ?? 4, '0')}`
                   : 'Ticket (Borrador)'
                 : 'Detalle del ticket'}
             </h2>

@@ -61,7 +61,7 @@ const s = {
  *   items     array    — line items
  *   payments  array    — payment entries
  */
-export function TicketPrintView({ ticket, items, payments, headerText, footerText }) {
+export function TicketPrintView({ ticket, items, payments, headerText, footerText, folioPadding = 4 }) {
   return (
     <div className="ticket-print">
       <div style={s.root}>
@@ -72,7 +72,7 @@ export function TicketPrintView({ ticket, items, payments, headerText, footerTex
           <div style={{ fontSize: '11px', color: '#555', marginTop: '2px' }}>TICKET DE VENTA</div>
           {ticket.folio != null && (
             <div style={{ ...s.bold, fontSize: '14px', marginTop: '4px' }}>
-              #{String(ticket.folio).padStart(4, '0')}
+              #{String(ticket.folio).padStart(folioPadding, '0')}
             </div>
           )}
         </div>
