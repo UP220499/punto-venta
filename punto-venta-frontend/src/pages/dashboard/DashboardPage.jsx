@@ -39,7 +39,7 @@ const COLOR_CLASSES = {
 
 /* ── KPI card ────────────────────────────────────────── */
 
-function KpiCard({ title, value, note, color, icon, loading, canAccess }) {
+function KpiCard({ title, value, note, color, icon, loading, canAccess, hasError }) {
   const c = COLOR_CLASSES[color]
   return (
     <div className={`bg-white rounded-xl border ${c.border} p-5 shadow-sm`}>
@@ -49,6 +49,8 @@ function KpiCard({ title, value, note, color, icon, loading, canAccess }) {
       </div>
       {!canAccess ? (
         <p className="text-sm text-gray-300 font-medium">Sin permiso</p>
+      ) : hasError ? (
+        <p className="text-sm text-red-400 font-medium">Error al cargar</p>
       ) : loading ? (
         <div className="h-9 w-24 animate-pulse bg-gray-100 rounded-lg" />
       ) : (
@@ -136,35 +138,35 @@ export function DashboardPage() {
   const canViewUsers    = usePermission(PERMISSIONS.USER_READ)
 
   // Ventas hoy — requiere REPORT_READ
-  const { data: salesSummary, isLoading: loadingSales } = useQuery({
+  const { data: salesSummary, isLoading: loadingSales, isError: errorSales } = useQuery({
     queryKey: ['dashboard', 'sales-today', todayStr],
     queryFn: () => getReportsSalesSummary({ from: todayStr, to: todayStr }),
     enabled: canViewReports,
   })
 
   // Tickets abiertos (BORRADOR) — requiere SALE_VIEW
-  const { data: openTicketsData, isLoading: loadingOpenTickets } = useQuery({
+  const { data: openTicketsData, isLoading: loadingOpenTickets, isError: errorOpenTickets } = useQuery({
     queryKey: ['dashboard', 'open-tickets'],
     queryFn: () => listTickets({ estatus: 'BORRADOR', page_size: 1 }),
     enabled: canViewSales,
   })
 
   // Productos activos — requiere PRODUCT_READ
-  const { data: productsData, isLoading: loadingProducts } = useQuery({
+  const { data: productsData, isLoading: loadingProducts, isError: errorProducts } = useQuery({
     queryKey: ['dashboard', 'active-products'],
     queryFn: () => listProducts({ page: 1, page_size: 1, estatus: 'ACTIVO' }),
     enabled: canViewProducts,
   })
 
   // Usuarios activos — requiere USER_READ
-  const { data: usersData, isLoading: loadingUsers } = useQuery({
+  const { data: usersData, isLoading: loadingUsers, isError: errorUsers } = useQuery({
     queryKey: ['dashboard', 'active-users'],
     queryFn: () => listUsers({ page: 1, pageSize: 1, activo: true }),
     enabled: canViewUsers,
   })
 
   // Ventas recientes hoy (últimos 5 tickets cerrados) — requiere SALE_VIEW
-  const { data: recentSalesData, isLoading: loadingRecent } = useQuery({
+  const { data: recentSalesData, isLoading: loadingRecent, isError: errorRecent } = useQuery({
     queryKey: ['dashboard', 'recent-sales', todayStr],
     queryFn: () => listTickets({ estatus: 'CERRADO', page_size: 5, from: todayStr, to: todayStr }),
     enabled: canViewSales,
@@ -183,6 +185,7 @@ export function DashboardPage() {
       ),
       loading: canViewReports && loadingSales,
       canAccess: canViewReports,
+      hasError: errorSales,
     },
     {
       title: 'Tickets abiertos',
@@ -196,6 +199,7 @@ export function DashboardPage() {
       ),
       loading: canViewSales && loadingOpenTickets,
       canAccess: canViewSales,
+      hasError: errorOpenTickets,
     },
     {
       title: 'Productos activos',
@@ -209,6 +213,7 @@ export function DashboardPage() {
       ),
       loading: canViewProducts && loadingProducts,
       canAccess: canViewProducts,
+      hasError: errorProducts,
     },
     {
       title: 'Usuarios activos',
@@ -222,6 +227,7 @@ export function DashboardPage() {
       ),
       loading: canViewUsers && loadingUsers,
       canAccess: canViewUsers,
+      hasError: errorUsers,
     },
   ]
 
@@ -284,6 +290,10 @@ export function DashboardPage() {
                 </svg>
               </div>
               <p className="text-sm font-medium text-gray-400">Sin permiso</p>
+            </div>
+          ) : errorRecent ? (
+            <div className="flex flex-col items-center justify-center py-6 text-center">
+              <p className="text-sm text-red-400">Error al cargar ventas recientes</p>
             </div>
           ) : loadingRecent ? (
             <div className="space-y-3">

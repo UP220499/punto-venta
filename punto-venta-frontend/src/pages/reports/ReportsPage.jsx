@@ -92,7 +92,7 @@ function IconSpinner({ className = 'w-5 h-5 text-indigo-500' }) {
 
 /* ── metric card ─────────────────────────────────────── */
 
-function MetricCard({ label, value, sub, loading }) {
+function MetricCard({ label, value, sub, loading, hasError }) {
   return (
     <div className="bg-white rounded-xl border border-gray-200 px-5 py-4">
       <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">{label}</p>
@@ -100,6 +100,8 @@ function MetricCard({ label, value, sub, loading }) {
         <div className="h-8 flex items-center">
           <IconSpinner className="w-4 h-4 text-gray-300" />
         </div>
+      ) : hasError ? (
+        <p className="text-sm text-red-400 font-medium">Error al cargar</p>
       ) : (
         <>
           <p className="text-2xl font-bold text-gray-900 tabular-nums">{value}</p>
@@ -123,12 +125,20 @@ function Section({ title, children }) {
 
 /* ── sales by day table ──────────────────────────────── */
 
-function SalesByDayTable({ data, loading }) {
+function SalesByDayTable({ data, loading, hasError }) {
   if (loading) {
     return (
       <div className="bg-white rounded-xl border border-gray-200 flex items-center justify-center py-10 gap-2 text-gray-400">
         <IconSpinner className="w-4 h-4 text-gray-300" />
         <span className="text-sm">Cargando…</span>
+      </div>
+    )
+  }
+
+  if (hasError) {
+    return (
+      <div className="bg-white rounded-xl border border-red-200 py-10 text-center text-sm text-red-400">
+        Error al cargar ventas por día
       </div>
     )
   }
@@ -179,12 +189,20 @@ function SalesByDayTable({ data, loading }) {
 
 /* ── top products table ──────────────────────────────── */
 
-function TopProductsTable({ data, loading }) {
+function TopProductsTable({ data, loading, hasError }) {
   if (loading) {
     return (
       <div className="bg-white rounded-xl border border-gray-200 flex items-center justify-center py-10 gap-2 text-gray-400">
         <IconSpinner className="w-4 h-4 text-gray-300" />
         <span className="text-sm">Cargando…</span>
+      </div>
+    )
+  }
+
+  if (hasError) {
+    return (
+      <div className="bg-white rounded-xl border border-red-200 py-10 text-center text-sm text-red-400">
+        Error al cargar productos más vendidos
       </div>
     )
   }
@@ -265,10 +283,10 @@ export function ReportsPage() {
     setActivePreset(null)
   }
 
-  const { data: summary, isLoading: loadingSummary } = useReportsSalesSummary({ from, to })
-  const { data: byDay,   isLoading: loadingByDay }   = useReportsSalesByDay({ from, to })
-  const { data: topProd, isLoading: loadingTopProd } = useReportsTopProducts({ from, to })
-  const { data: invData, isLoading: loadingInv }     = useReportsInventorySummary({ from, to })
+  const { data: summary, isLoading: loadingSummary, isError: errorSummary } = useReportsSalesSummary({ from, to })
+  const { data: byDay,   isLoading: loadingByDay, isError: errorByDay }   = useReportsSalesByDay({ from, to })
+  const { data: topProd, isLoading: loadingTopProd, isError: errorTopProd } = useReportsTopProducts({ from, to })
+  const { data: invData, isLoading: loadingInv, isError: errorInv }     = useReportsInventorySummary({ from, to })
 
   return (
     <div className="flex flex-col h-full">
@@ -334,21 +352,25 @@ export function ReportsPage() {
                 label="Tickets cerrados"
                 value={summary ? fmtInt(summary.tickets_count) : '—'}
                 loading={loadingSummary}
+                hasError={errorSummary}
               />
               <MetricCard
                 label="Ventas brutas"
                 value={summary ? fmtCur(summary.gross_sales) : '—'}
                 loading={loadingSummary}
+                hasError={errorSummary}
               />
               <MetricCard
                 label="Total cobrado"
                 value={summary ? fmtCur(summary.payments_total) : '—'}
                 loading={loadingSummary}
+                hasError={errorSummary}
               />
               <MetricCard
                 label="Ticket promedio"
                 value={summary ? fmtCur(summary.avg_ticket) : '—'}
                 loading={loadingSummary}
+                hasError={errorSummary}
               />
             </div>
           </Section>
@@ -361,30 +383,33 @@ export function ReportsPage() {
                 value={invData ? fmtQty(invData.entries_qty) : '—'}
                 sub="unidades"
                 loading={loadingInv}
+                hasError={errorInv}
               />
               <MetricCard
                 label="Ajustes manuales"
                 value={invData ? fmtQty(invData.adjustments_qty) : '—'}
                 sub="unidades"
                 loading={loadingInv}
+                hasError={errorInv}
               />
               <MetricCard
                 label="Salidas por ventas"
                 value={invData ? fmtQty(invData.sales_qty) : '—'}
                 sub="unidades"
                 loading={loadingInv}
+                hasError={errorInv}
               />
             </div>
           </Section>
 
           {/* Sales by day */}
           <Section title="Ventas por día">
-            <SalesByDayTable data={byDay} loading={loadingByDay} />
+            <SalesByDayTable data={byDay} loading={loadingByDay} hasError={errorByDay} />
           </Section>
 
           {/* Top products */}
           <Section title="Productos más vendidos">
-            <TopProductsTable data={topProd} loading={loadingTopProd} />
+            <TopProductsTable data={topProd} loading={loadingTopProd} hasError={errorTopProd} />
           </Section>
 
         </div>
