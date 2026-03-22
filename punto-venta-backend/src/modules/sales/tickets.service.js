@@ -130,28 +130,56 @@ async function closeTicket(businessId, userId, ticketId, payments) {
     const folio = Number(settings.ticket_folio_next);
     await repo.incrementFolioNext(trx, businessId);
 
-    // 2e. Validate payment sum
-    const total = Number(ticket.total);
-    const sumPagos = round2(payments.reduce((s, p) => s + p.monto, 0));
-    if (sumPagos < total) {
-      throw appError('PAYMENT_INSUFFICIENT', `Payment sum ${sumPagos} < total ${total}`, 400);
+    // 2e. Calculate taxes from business settings
+    //
+    // Regla contable:
+    //   tax_enabled=false  → impuestos=0, total=taxableBase
+    //   tax_included=true  → precio ya incluye IVA; se extrae la porción fiscal
+    //                        impuestos = base - base/(1+rate)
+    //                        total = taxableBase (sin cambio, IVA ya está dentro)
+    //   tax_included=false → IVA se suma encima del subtotal
+    //                        impuestos = base * rate
+    //                        total = taxableBase + impuestos
+    //
+    const subtotal = Number(ticket.subtotal);
+    const descuento = Number(ticket.descuento_total);
+    const taxableBase = round2(subtotal - descuento);
+    let impuestosTotalCalc = 0;
+    let totalCalc = taxableBase;
+
+    if (settings.tax_enabled) {
+      const rate = Number(settings.tax_rate);
+      if (settings.tax_included_in_price) {
+        impuestosTotalCalc = round2(taxableBase - taxableBase / (1 + rate));
+      } else {
+        impuestosTotalCalc = round2(taxableBase * rate);
+        totalCalc = round2(taxableBase + impuestosTotalCalc);
+      }
     }
-    const cambio = round2(sumPagos - total);
+
+    // 2f. Validate payment sum against computed total
+    const sumPagos = round2(payments.reduce((s, p) => s + p.monto, 0));
+    if (sumPagos < totalCalc) {
+      throw appError('PAYMENT_INSUFFICIENT', `Payment sum ${sumPagos} < total ${totalCalc}`, 400);
+    }
+    const cambio = round2(sumPagos - totalCalc);
     // NOTE: cambio is allowed even if no EFECTIVO method present — simplification
 
-    // 2f. Conditionally close ticket only if it is still BORRADOR
+    // 2g. Conditionally close ticket only if it is still BORRADOR
     // (extra guard for concurrent close attempts).
     const updated = await repo.updateTicketCloseIfDraft(trx, ticketId, businessId, {
       estatus: 'CERRADO',
       folio,
       closed_at: knex.fn.now(),
+      impuestos_total: impuestosTotalCalc,
+      total: totalCalc,
       cambio,
     });
     if (!updated) {
       throw appError('TICKET_NOT_DRAFT', 'Ticket is not a draft', 409);
     }
 
-    // 2g. Insert sale_payment rows (only after conditional close succeeds)
+    // 2h. Insert sale_payment rows (only after conditional close succeeds)
     const paymentRows = payments.map((p) => ({
       business_id: businessId,
       ticket_id: ticketId,
@@ -162,7 +190,7 @@ async function closeTicket(businessId, userId, ticketId, payments) {
     }));
     await repo.insertPayments(trx, paymentRows);
 
-    // 2h. Deduct stock + insert inventory movements
+    // 2i. Deduct stock + insert inventory movements
     const movementRows = [];
     for (const item of ticketItems) {
       await repo.updateProductStock(trx, item.product_id, Number(item.cantidad));
