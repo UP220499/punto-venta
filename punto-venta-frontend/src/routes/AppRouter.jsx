@@ -16,6 +16,7 @@ import { RolesPage } from '../pages/roles/RolesPage'
 import { PaymentMethodsPage } from '../pages/payment-methods/PaymentMethodsPage'
 import { ReportsPage } from '../pages/reports/ReportsPage'
 import { SettingsPage } from '../pages/settings/SettingsPage'
+import { AuditPage } from '../pages/audit/AuditPage'
 
 // Redirección reactiva: responde al estado de auth en tiempo real
 function RootRedirect() {
@@ -50,7 +51,7 @@ const router = createBrowserRouter([
           { path: '/payment-methods', element: <RequirePermission code={PERMISSIONS.PAYMENT_METHOD_READ}><PaymentMethodsPage /></RequirePermission> },
           { path: '/reports',   element: <RequirePermission code={PERMISSIONS.REPORT_READ}><ReportsPage /></RequirePermission> },
           { path: '/settings',  element: <RequirePermission code={PERMISSIONS.SETTINGS_READ}><SettingsPage /></RequirePermission> },
-          // Agregar nuevas rutas aquí dentro de AuthLayout
+          { path: '/audit',     element: <RequirePermission code={PERMISSIONS.AUDIT_READ}><AuditPage /></RequirePermission> },
         ],
       },
     ],
