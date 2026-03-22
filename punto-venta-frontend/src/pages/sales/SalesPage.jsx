@@ -277,7 +277,7 @@ function TicketItem({ item, onSetQuantity, onRemove }) {
 
 /* ── ticket panel (right) ────────────────────────────────── */
 
-function TicketPanel({ items, subtotal, total, onSetQuantity, onRemove, onClear, onCobrar, taxSettings }) {
+function TicketPanel({ items, subtotal, total, estimatedTax, taxEnabled, taxIncluded, taxRatePct, onSetQuantity, onRemove, onClear, onCobrar }) {
   const isEmpty = items.length === 0
 
   return (
@@ -348,12 +348,10 @@ function TicketPanel({ items, subtotal, total, onSetQuantity, onRemove, onClear,
             <span>Subtotal</span>
             <span className="tabular-nums font-medium text-gray-700">{fmt(subtotal)}</span>
           </div>
-          {taxSettings?.tax_enabled && (
+          {taxEnabled && (
             <div className="flex items-center justify-between text-sm text-gray-500">
-              <span>Impuestos ({taxSettings.tax_rate_pct}%)</span>
-              <span className="tabular-nums text-gray-400 text-xs">
-                {taxSettings.tax_included_in_price ? 'Incluidos en precio' : 'No aplicados aún'}
-              </span>
+              <span>Impuestos ({taxRatePct}%){taxIncluded ? ' incl.' : ''}</span>
+              <span className="tabular-nums font-medium text-gray-700">{fmt(estimatedTax)}</span>
             </div>
           )}
           <div className="flex items-center justify-between pt-1.5 border-t border-gray-100">
@@ -387,14 +385,21 @@ export function SalesPage() {
   const canClose = usePermission(PERMISSIONS.SALE_CLOSE)
   const { data: settings } = useSettings()
 
-  // Build tax display info from backend settings (tax_rate is decimal, e.g. 0.16)
-  const taxSettings = settings?.tax_enabled
-    ? {
-        tax_enabled: true,
-        tax_rate_pct: parseFloat((settings.tax_rate * 100).toFixed(2)),
-        tax_included_in_price: settings.tax_included_in_price,
-      }
-    : null
+  // Estimate tax locally (mirrors backend formula in tickets.service.js)
+  const round2 = (n) => Math.round(n * 100) / 100
+  const taxRate = Number(settings?.tax_rate) || 0
+  const taxEnabled = !!settings?.tax_enabled && taxRate > 0
+  const taxIncluded = !!settings?.tax_included_in_price
+
+  const estimatedTax = !taxEnabled
+    ? 0
+    : taxIncluded
+      ? round2(ticket.subtotal - ticket.subtotal / (1 + taxRate))
+      : round2(ticket.subtotal * taxRate)
+
+  const estimatedTotal = !taxEnabled || taxIncluded
+    ? ticket.subtotal
+    : round2(ticket.subtotal + estimatedTax)
 
   // Stock alert: { nombre, available } | null
   const [stockAlert, setStockAlert] = useState(null)
@@ -447,7 +452,11 @@ export function SalesPage() {
         <TicketPanel
           items={ticket.items}
           subtotal={ticket.subtotal}
-          total={ticket.total}
+          total={estimatedTotal}
+          estimatedTax={estimatedTax}
+          taxEnabled={taxEnabled}
+          taxIncluded={taxIncluded}
+          taxRatePct={parseFloat((taxRate * 100).toFixed(2))}
           onSetQuantity={handleSetQuantity}
           onRemove={ticket.removeItem}
           onClear={() => {
@@ -455,14 +464,13 @@ export function SalesPage() {
             setStockAlert(null)
           }}
           onCobrar={canClose ? handleCobrar : undefined}
-          taxSettings={taxSettings}
         />
       </div>
     </div>
 
     <CheckoutModal
       isOpen={isCheckoutOpen}
-      total={ticket.total}
+      total={estimatedTotal}
       cartItems={ticket.items}
       onClose={() => setIsCheckoutOpen(false)}
       onSuccess={ticket.clearTicket}
