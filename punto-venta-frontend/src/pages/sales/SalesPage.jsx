@@ -3,6 +3,7 @@ import { useProducts } from '../../features/products/useProducts'
 import { useTicket } from '../../features/sales/useTicket'
 import { CheckoutModal } from './CheckoutModal'
 import { usePermission, PERMISSIONS } from '../../lib/permissions'
+import { useSettings } from '../../features/settings/useSettings'
 
 /* ── currency formatter ──────────────────────────────────── */
 
@@ -276,7 +277,7 @@ function TicketItem({ item, onSetQuantity, onRemove }) {
 
 /* ── ticket panel (right) ────────────────────────────────── */
 
-function TicketPanel({ items, subtotal, total, onSetQuantity, onRemove, onClear, onCobrar }) {
+function TicketPanel({ items, subtotal, total, onSetQuantity, onRemove, onClear, onCobrar, taxSettings }) {
   const isEmpty = items.length === 0
 
   return (
@@ -347,10 +348,14 @@ function TicketPanel({ items, subtotal, total, onSetQuantity, onRemove, onClear,
             <span>Subtotal</span>
             <span className="tabular-nums font-medium text-gray-700">{fmt(subtotal)}</span>
           </div>
-          <div className="flex items-center justify-between text-sm text-gray-500">
-            <span>Impuestos</span>
-            <span className="tabular-nums text-gray-400 text-xs">Incluidos</span>
-          </div>
+          {taxSettings?.tax_enabled && (
+            <div className="flex items-center justify-between text-sm text-gray-500">
+              <span>Impuestos ({taxSettings.tax_rate_pct}%)</span>
+              <span className="tabular-nums text-gray-400 text-xs">
+                {taxSettings.tax_included_in_price ? 'Incluidos en precio' : 'No aplicados aún'}
+              </span>
+            </div>
+          )}
           <div className="flex items-center justify-between pt-1.5 border-t border-gray-100">
             <span className="text-base font-bold text-gray-900">Total</span>
             <span className="text-lg font-bold text-indigo-600 tabular-nums">{fmt(total)}</span>
@@ -380,6 +385,16 @@ function TicketPanel({ items, subtotal, total, onSetQuantity, onRemove, onClear,
 export function SalesPage() {
   const ticket = useTicket()
   const canClose = usePermission(PERMISSIONS.SALE_CLOSE)
+  const { data: settings } = useSettings()
+
+  // Build tax display info from backend settings (tax_rate is decimal, e.g. 0.16)
+  const taxSettings = settings?.tax_enabled
+    ? {
+        tax_enabled: true,
+        tax_rate_pct: parseFloat((settings.tax_rate * 100).toFixed(2)),
+        tax_included_in_price: settings.tax_included_in_price,
+      }
+    : null
 
   // Stock alert: { nombre, available } | null
   const [stockAlert, setStockAlert] = useState(null)
@@ -440,6 +455,7 @@ export function SalesPage() {
             setStockAlert(null)
           }}
           onCobrar={canClose ? handleCobrar : undefined}
+          taxSettings={taxSettings}
         />
       </div>
     </div>
