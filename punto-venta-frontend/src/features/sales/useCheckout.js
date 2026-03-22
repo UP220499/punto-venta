@@ -28,6 +28,10 @@ export function useCheckout() {
       queryClient.invalidateQueries({ queryKey: ['products'] })
       // A closed sale affects all report metrics (sales + inventory)
       queryClient.invalidateQueries({ queryKey: ['reports'] })
+      // Refresh ticket history so the new sale appears immediately
+      queryClient.invalidateQueries({ queryKey: ['tickets'] })
+      // Refresh dashboard KPIs (ventas hoy, tickets abiertos, ventas recientes)
+      queryClient.invalidateQueries({ queryKey: ['dashboard'] })
     },
     onError: () => {
       // Refresh stock in case backend updated inventory before rejecting (race condition)
