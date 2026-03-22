@@ -4,6 +4,7 @@ import { useAuth } from '../../contexts/AuthContext'
 const PAGE_TITLES = {
   '/dashboard': 'Dashboard',
   '/sales': 'Ventas',
+  '/tickets': 'Historial de ventas',
   '/products': 'Productos',
   '/inventory': 'Inventario',
   '/reports': 'Reportes',

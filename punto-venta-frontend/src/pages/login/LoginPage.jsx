@@ -30,8 +30,8 @@ export function LoginPage() {
     })
   }
 
-  // El backend devuelve { error: { code, message } } en errores
   const serverError =
+    error?.response?.data?.message ??
     error?.response?.data?.error?.message ??
     error?.message ??
     'Error al iniciar sesión'

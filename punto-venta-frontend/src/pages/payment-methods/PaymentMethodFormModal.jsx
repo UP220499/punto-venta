@@ -55,8 +55,8 @@ function FieldError({ msg }) {
 function extractError(err) {
   if (!err) return null
   return (
-    err.response?.data?.error?.message ??
     err.response?.data?.message ??
+    err.response?.data?.error?.message ??
     err.message ??
     'Error desconocido'
   )
