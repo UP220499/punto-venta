@@ -12,6 +12,7 @@ const PAGE_TITLES = {
   '/users': 'Usuarios',
   '/roles': 'Roles y permisos',
   '/settings': 'Configuración',
+  '/audit': 'Auditoría',
 }
 
 export function Topbar() {

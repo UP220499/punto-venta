@@ -6,6 +6,7 @@ import { getReportsSalesSummary } from '../../features/reports/reportsApi'
 import { listTickets } from '../../features/sales/salesApi'
 import { listProducts } from '../../features/products/productsApi'
 import { listUsers } from '../../features/users/usersApi'
+import { listAuditLogs } from '../../features/audit/auditApi'
 
 /* ── date helper ─────────────────────────────────────── */
 
@@ -132,6 +133,7 @@ export function DashboardPage() {
     day: 'numeric',
   })
 
+  const canViewAudit    = usePermission(PERMISSIONS.AUDIT_READ)
   const canViewReports  = usePermission(PERMISSIONS.REPORT_READ)
   const canViewSales    = usePermission(PERMISSIONS.SALE_VIEW)
   const canViewProducts = usePermission(PERMISSIONS.PRODUCT_READ)
@@ -163,6 +165,13 @@ export function DashboardPage() {
     queryKey: ['dashboard', 'active-users'],
     queryFn: () => listUsers({ page: 1, pageSize: 1, activo: true }),
     enabled: canViewUsers,
+  })
+
+  // Actividad reciente (últimos 5 audit logs) — requiere AUDIT_READ
+  const { data: auditData, isLoading: loadingAudit, isError: errorAudit } = useQuery({
+    queryKey: ['dashboard', 'recent-audit'],
+    queryFn: () => listAuditLogs({ page: 1, page_size: 5 }),
+    enabled: canViewAudit,
   })
 
   // Ventas recientes hoy (últimos 5 tickets cerrados) — requiere SALE_VIEW
@@ -326,22 +335,68 @@ export function DashboardPage() {
           )}
         </div>
 
-        {/* Actividad reciente — módulo no implementado en esta versión */}
+        {/* Actividad reciente — conectado al endpoint de auditoría */}
         <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
           <div className="flex items-center justify-between mb-1">
             <h3 className="text-sm font-semibold text-gray-700">Actividad reciente</h3>
             <span className="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded">Sistema</span>
           </div>
           <p className="text-xs text-gray-400 mb-5">Últimas acciones de usuarios</p>
-          <div className="flex flex-col items-center justify-center py-6 text-center">
-            <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mb-3">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-6 h-6 text-gray-300">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
+
+          {!canViewAudit ? (
+            <div className="flex flex-col items-center justify-center py-6 text-center">
+              <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center mb-3">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-5 h-5 text-gray-300">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+                </svg>
+              </div>
+              <p className="text-sm font-medium text-gray-400">Sin permiso</p>
             </div>
-            <p className="text-sm font-medium text-gray-500">No disponible</p>
-            <p className="text-xs text-gray-400 mt-1">El registro de auditoría no está habilitado en esta versión</p>
-          </div>
+          ) : errorAudit ? (
+            <div className="flex flex-col items-center justify-center py-6 text-center">
+              <p className="text-sm text-red-400">Error al cargar actividad</p>
+            </div>
+          ) : loadingAudit ? (
+            <div className="space-y-3">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="h-11 animate-pulse bg-gray-100 rounded-lg" />
+              ))}
+            </div>
+          ) : (auditData?.items ?? []).length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-6 text-center">
+              <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mb-3">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-6 h-6 text-gray-300">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <p className="text-sm font-medium text-gray-500">Sin actividad registrada</p>
+              <p className="text-xs text-gray-400 mt-1">Los eventos del sistema aparecerán aquí</p>
+            </div>
+          ) : (
+            <>
+              <div className="divide-y divide-gray-100">
+                {(auditData?.items ?? []).map((log) => (
+                  <div key={log.audit_id} className="flex items-start gap-3 py-3 first:pt-0 last:pb-0">
+                    <div className={`mt-0.5 w-2 h-2 rounded-full shrink-0 ${
+                      log.severity === 'ERROR' ? 'bg-red-400' : log.severity === 'WARN' ? 'bg-amber-400' : 'bg-blue-400'
+                    }`} />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm text-gray-800 truncate">{log.message}</p>
+                      <p className="text-xs text-gray-400 mt-0.5">
+                        {log.actor_username ?? 'Sistema'} · {fmtTime(log.created_at)}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <Link
+                to="/audit"
+                className="block mt-4 text-center text-sm text-indigo-600 hover:text-indigo-800 font-medium transition-colors"
+              >
+                Ver todo →
+              </Link>
+            </>
+          )}
         </div>
 
       </div>
