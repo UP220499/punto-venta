@@ -1,5 +1,42 @@
 @import "tailwindcss";
 
+/* ── Brand custom properties (defaults — overridden at runtime by BrandingVars) */
+:root {
+  --brand: #4F46E5;
+  --brand-hover: color-mix(in srgb, var(--brand) 85%, white);
+  --brand-active: color-mix(in srgb, var(--brand) 90%, black);
+  --brand-surface: #111827;
+}
+
+/* ── Branded button base ─────────────────────────────── */
+/* Use: className="btn-brand px-4 py-2 text-sm rounded-lg" */
+/* Provides: bg, text-white, hover, active, disabled, focus-visible */
+/* Does NOT provide: padding, font-size, border-radius, layout (flex/gap) */
+@layer components {
+  .btn-brand {
+    background-color: var(--brand);
+    color: white;
+    font-weight: 500;
+    transition-property: color, background-color, opacity;
+    transition-duration: 150ms;
+    cursor: pointer;
+  }
+  .btn-brand:hover:not(:disabled) {
+    background-color: var(--brand-hover);
+  }
+  .btn-brand:active:not(:disabled) {
+    background-color: var(--brand-active);
+  }
+  .btn-brand:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+  .btn-brand:focus-visible {
+    outline: 2px solid var(--brand);
+    outline-offset: 2px;
+  }
+}
+
 /* ── Print styles ─────────────────────────────────────── */
 .ticket-print { display: none; }
 

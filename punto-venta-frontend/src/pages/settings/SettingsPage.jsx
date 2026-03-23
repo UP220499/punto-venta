@@ -9,6 +9,13 @@ import { useUpdateSettings } from '../../features/settings/useUpdateSettings'
 /* ── Zod schema ───────────────────────────────────────── */
 
 const schema = z.object({
+  // Branding
+  business_name:              z.string().min(1, 'Requerido').max(100),
+  business_subtitle:          z.string().max(200),
+  brand_logo_url:             z.string().max(500),
+  brand_primary_color:        z.string().regex(/^#[0-9A-Fa-f]{6}$/, 'Formato: #RRGGBB').or(z.literal('')),
+  brand_surface_dark:         z.string().regex(/^#[0-9A-Fa-f]{6}$/, 'Formato: #RRGGBB').or(z.literal('')),
+  // General
   currency_code:              z.string().min(3).max(3, 'Exactamente 3 caracteres (ej: MXN)'),
   currency_symbol:            z.string().min(1, 'Requerido').max(5),
   decimal_places:             z.coerce.number().int().min(0).max(4),
@@ -34,6 +41,11 @@ const schema = z.object({
 
 function toFormValues(s) {
   return {
+    business_name:              s.business_name ?? '',
+    business_subtitle:          s.business_subtitle ?? '',
+    brand_logo_url:             s.brand_logo_url ?? '',
+    brand_primary_color:        s.brand_primary_color ?? '',
+    brand_surface_dark:         s.brand_surface_dark ?? '',
     currency_code:              s.currency_code,
     currency_symbol:            s.currency_symbol,
     decimal_places:             s.decimal_places,
@@ -81,7 +93,7 @@ function Field({ label, hint, error, children }) {
 }
 
 const inputCls =
-  'w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 disabled:bg-gray-50 disabled:text-gray-500'
+  'w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[--brand] focus:border-[--brand] disabled:bg-gray-50 disabled:text-gray-500'
 
 /* ── page ─────────────────────────────────────────────── */
 
@@ -94,8 +106,14 @@ export function SettingsPage() {
     register,
     handleSubmit,
     reset,
+    watch,
+    setValue,
     formState: { errors },
   } = useForm({ resolver: zodResolver(schema) })
+
+  const watchColor   = watch('brand_primary_color')
+  const watchSurface = watch('brand_surface_dark')
+  const watchLogo    = watch('brand_logo_url')
 
   // Populate form once settings are fetched
   useEffect(() => {
@@ -116,6 +134,10 @@ export function SettingsPage() {
       ticket_folio_prefix,
       ticket_header_text,
       ticket_footer_text,
+      business_subtitle,
+      brand_logo_url,
+      brand_primary_color,
+      brand_surface_dark,
       ...rest
     } = values
 
@@ -125,6 +147,10 @@ export function SettingsPage() {
       ticket_folio_prefix: ticket_folio_prefix || null,
       ticket_header_text:  ticket_header_text  || null,
       ticket_footer_text:  ticket_footer_text  || null,
+      business_subtitle:   business_subtitle   || null,
+      brand_logo_url:      brand_logo_url      || null,
+      brand_primary_color: brand_primary_color  || null,
+      brand_surface_dark:  brand_surface_dark   || null,
     })
   }
 
@@ -134,7 +160,7 @@ export function SettingsPage() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-full text-gray-500 gap-2">
-        <svg className="animate-spin w-5 h-5 text-indigo-600" fill="none" viewBox="0 0 24 24">
+        <svg className="animate-spin w-5 h-5 text-[--brand]" fill="none" viewBox="0 0 24 24">
           <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
           <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
         </svg>
@@ -188,7 +214,7 @@ export function SettingsPage() {
               type="button"
               onClick={handleSubmit(onSubmit)}
               disabled={disabled}
-              className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="btn-brand inline-flex items-center gap-2 px-4 py-2 text-sm rounded-lg"
             >
               {mutation.isPending && (
                 <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
@@ -215,6 +241,84 @@ export function SettingsPage() {
               <p className="text-sm text-amber-700">Solo tienes permiso de lectura. Los cambios no pueden guardarse.</p>
             </div>
           )}
+
+          {/* 0 — Identidad del negocio */}
+          <Section title="Identidad del negocio">
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-x-6 gap-y-4">
+                <Field label="Nombre del negocio" error={errors.business_name?.message}>
+                  <input
+                    {...register('business_name')}
+                    disabled={disabled}
+                    className={inputCls}
+                    placeholder="Mi Negocio"
+                  />
+                </Field>
+                <Field label="Subtítulo" hint="Ej: Internacional de Llantas" error={errors.business_subtitle?.message}>
+                  <input
+                    {...register('business_subtitle')}
+                    disabled={disabled}
+                    className={inputCls}
+                    placeholder="Descripción o giro"
+                  />
+                </Field>
+              </div>
+              <Field label="URL del logo" hint="Ruta relativa, ej: /branding/logo.png" error={errors.brand_logo_url?.message}>
+                <div className="flex items-center gap-3">
+                  <input
+                    {...register('brand_logo_url')}
+                    disabled={disabled}
+                    className={inputCls}
+                    placeholder="/branding/mi-logo.png"
+                  />
+                  {watchLogo && (
+                    <img
+                      src={watchLogo}
+                      alt="Logo preview"
+                      className="w-10 h-10 rounded-lg object-contain border border-gray-200 bg-white shrink-0"
+                      onError={(e) => { e.target.style.display = 'none' }}
+                    />
+                  )}
+                </div>
+              </Field>
+              <div className="grid grid-cols-2 gap-x-6 gap-y-4">
+                <Field label="Color principal" hint="Acciones y acentos #RRGGBB" error={errors.brand_primary_color?.message}>
+                  <div className="flex items-center gap-3">
+                    <input
+                      {...register('brand_primary_color')}
+                      disabled={disabled}
+                      className={`${inputCls} max-w-48`}
+                      placeholder="#A52222"
+                    />
+                    <input
+                      type="color"
+                      value={watchColor && /^#[0-9A-Fa-f]{6}$/.test(watchColor) ? watchColor : '#4F46E5'}
+                      disabled={disabled}
+                      onChange={(e) => setValue('brand_primary_color', e.target.value, { shouldValidate: true })}
+                      className="w-10 h-10 rounded-lg border border-gray-300 cursor-pointer disabled:cursor-not-allowed p-0.5"
+                    />
+                  </div>
+                </Field>
+                <Field label="Color oscuro (superficies)" hint="Sidebar y login #RRGGBB" error={errors.brand_surface_dark?.message}>
+                  <div className="flex items-center gap-3">
+                    <input
+                      {...register('brand_surface_dark')}
+                      disabled={disabled}
+                      className={`${inputCls} max-w-48`}
+                      placeholder="#111827"
+                    />
+                    <input
+                      type="color"
+                      value={watchSurface && /^#[0-9A-Fa-f]{6}$/.test(watchSurface) ? watchSurface : '#111827'}
+                      disabled={disabled}
+                      onChange={(e) => setValue('brand_surface_dark', e.target.value, { shouldValidate: true })}
+                      className="w-10 h-10 rounded-lg border border-gray-300 cursor-pointer disabled:cursor-not-allowed p-0.5"
+                    />
+                  </div>
+                </Field>
+              </div>
+            </div>
+          </Section>
 
           {/* 1 — Información general */}
           <Section title="Información general">
@@ -311,7 +415,7 @@ export function SettingsPage() {
                   {...register('tax_enabled')}
                   type="checkbox"
                   disabled={disabled}
-                  className="w-4 h-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 disabled:cursor-not-allowed"
+                  className="w-4 h-4 rounded border-gray-300 text-[--brand] focus:ring-[--brand] disabled:cursor-not-allowed"
                 />
                 <span className="text-sm font-medium text-gray-700">Habilitar impuestos</span>
               </label>
@@ -333,7 +437,7 @@ export function SettingsPage() {
                   {...register('tax_included_in_price')}
                   type="checkbox"
                   disabled={disabled}
-                  className="w-4 h-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 disabled:cursor-not-allowed"
+                  className="w-4 h-4 rounded border-gray-300 text-[--brand] focus:ring-[--brand] disabled:cursor-not-allowed"
                 />
                 <span className="text-sm text-gray-700">Impuesto incluido en precio</span>
               </label>
@@ -379,7 +483,7 @@ export function SettingsPage() {
                     {...register('show_tax_breakdown')}
                     type="checkbox"
                     disabled={disabled}
-                    className="w-4 h-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 disabled:cursor-not-allowed"
+                    className="w-4 h-4 rounded border-gray-300 text-[--brand] focus:ring-[--brand] disabled:cursor-not-allowed"
                   />
                   <span className="text-sm text-gray-700">Mostrar desglose de impuestos</span>
                 </label>
@@ -388,7 +492,7 @@ export function SettingsPage() {
                     {...register('show_cashier_name')}
                     type="checkbox"
                     disabled={disabled}
-                    className="w-4 h-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 disabled:cursor-not-allowed"
+                    className="w-4 h-4 rounded border-gray-300 text-[--brand] focus:ring-[--brand] disabled:cursor-not-allowed"
                   />
                   <span className="text-sm text-gray-700">Mostrar nombre del cajero</span>
                 </label>
@@ -397,7 +501,7 @@ export function SettingsPage() {
                     {...register('show_barcode_on_ticket')}
                     type="checkbox"
                     disabled={disabled}
-                    className="w-4 h-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 disabled:cursor-not-allowed"
+                    className="w-4 h-4 rounded border-gray-300 text-[--brand] focus:ring-[--brand] disabled:cursor-not-allowed"
                   />
                   <span className="text-sm text-gray-700">Mostrar código de barras</span>
                 </label>
@@ -432,7 +536,7 @@ export function SettingsPage() {
                   {...register('require_transfer_reference')}
                   type="checkbox"
                   disabled={disabled}
-                  className="w-4 h-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 disabled:cursor-not-allowed"
+                  className="w-4 h-4 rounded border-gray-300 text-[--brand] focus:ring-[--brand] disabled:cursor-not-allowed"
                 />
                 <span className="text-sm text-gray-700">Requerir referencia en transferencias</span>
               </label>

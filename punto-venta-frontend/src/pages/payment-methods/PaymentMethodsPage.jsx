@@ -8,7 +8,7 @@ import { PaymentMethodFormModal } from './PaymentMethodFormModal'
 
 function IconSpinner() {
   return (
-    <svg className="animate-spin w-5 h-5 text-indigo-500" fill="none" viewBox="0 0 24 24">
+    <svg className="animate-spin w-5 h-5 text-[--brand]" fill="none" viewBox="0 0 24 24">
       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
     </svg>
@@ -71,7 +71,7 @@ function EmptyState({ onNew, canWrite }) {
         <button
           type="button"
           onClick={onNew}
-          className="mt-1 px-4 py-2 rounded-lg bg-indigo-600 text-sm font-medium text-white hover:bg-indigo-700 transition-colors"
+          className="btn-brand mt-1 px-4 py-2 rounded-lg text-sm"
         >
           Agregar primer método
         </button>
@@ -130,7 +130,7 @@ export function PaymentMethodsPage() {
             <button
               type="button"
               onClick={openCreate}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-indigo-600 text-sm font-medium text-white hover:bg-indigo-700 transition-colors"
+              className="btn-brand flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm"
             >
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
@@ -236,7 +236,7 @@ export function PaymentMethodsPage() {
                                 type="button"
                                 onClick={() => openEdit(m)}
                                 title="Editar método"
-                                className="p-1.5 rounded-lg text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 transition-colors"
+                                className="p-1.5 rounded-lg text-gray-400 hover:text-[--brand] hover:bg-[--brand]/10 transition-colors"
                               >
                                 <IconEdit />
                               </button>

@@ -127,7 +127,7 @@ export function RolesPage() {
                       <button
                         type="button"
                         onClick={() => setEditingRole(role)}
-                        className="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg text-sm font-medium text-indigo-600 border border-indigo-200 hover:bg-indigo-50 transition-colors shrink-0"
+                        className="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg text-sm font-medium text-[--brand] border border-[--brand]/25 hover:bg-[--brand]/10 transition-colors shrink-0"
                       >
                         <PencilIcon />
                         Editar permisos

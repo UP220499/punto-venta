@@ -1,6 +1,7 @@
 import { NavLink, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
 import { hasPermission } from '../../lib/permissions'
+import { useBranding } from '../../lib/useBranding'
 
 // permissionCode: código exacto del permiso (JWT) requerido para ver el item.
 // null = acceso libre para todos los usuarios autenticados.
@@ -124,6 +125,7 @@ const ADMIN_PATHS = ['/payment-methods', '/users', '/roles', '/settings', '/audi
 export function Sidebar() {
   const navigate = useNavigate()
   const { logout, user } = useAuth()
+  const { businessName, businessSubtitle, logoUrl, primaryColor, surfaceDark } = useBranding()
 
   function handleLogout() {
     logout()
@@ -135,17 +137,21 @@ export function Sidebar() {
   const adminItems = visibleItems.filter((i) => ADMIN_PATHS.includes(i.to))
 
   return (
-    <aside className="w-64 bg-slate-900 flex flex-col shrink-0 h-full">
+    <aside className="w-64 flex flex-col shrink-0 h-full" style={{ backgroundColor: surfaceDark }}>
       {/* Brand */}
       <div className="flex items-center gap-3 px-5 py-5 border-b border-slate-700/60">
-        <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center shrink-0">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5 text-white">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007z" />
-          </svg>
-        </div>
+        {logoUrl ? (
+          <img src={logoUrl} alt={businessName} className="w-8 h-8 rounded-lg object-contain shrink-0" />
+        ) : (
+          <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style={{ backgroundColor: primaryColor }}>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5 text-white">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007z" />
+            </svg>
+          </div>
+        )}
         <div className="min-w-0">
-          <p className="text-white font-semibold text-sm leading-tight truncate">Punto de Venta</p>
-          <p className="text-slate-400 text-xs">Sistema POS</p>
+          <p className="text-white font-semibold text-sm leading-tight truncate">{businessName}</p>
+          <p className="text-slate-400 text-xs">{businessSubtitle || 'Sistema POS'}</p>
         </div>
       </div>
 
@@ -159,10 +165,11 @@ export function Sidebar() {
               className={({ isActive }) =>
                 `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                   isActive
-                    ? 'bg-indigo-600 text-white'
+                    ? 'text-white'
                     : 'text-slate-400 hover:bg-slate-800 hover:text-white'
                 }`
               }
+              style={({ isActive }) => isActive ? { backgroundColor: primaryColor } : undefined}
             >
               {item.icon}
               <span className="truncate">{item.label}</span>
@@ -187,10 +194,11 @@ export function Sidebar() {
                   className={({ isActive }) =>
                     `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                       isActive
-                        ? 'bg-indigo-600 text-white'
+                        ? 'text-white'
                         : 'text-slate-400 hover:bg-slate-800 hover:text-white'
                     }`
                   }
+                  style={({ isActive }) => isActive ? { backgroundColor: primaryColor } : undefined}
                 >
                   {item.icon}
                   <span className="truncate">{item.label}</span>

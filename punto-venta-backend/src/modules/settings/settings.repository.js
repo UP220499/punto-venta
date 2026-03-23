@@ -18,4 +18,10 @@ async function updateSettings(businessId, patch, updatedBy) {
   return row;
 }
 
-module.exports = { getSettings, updateSettings };
+const BRANDING_COLS = ['business_name', 'business_subtitle', 'brand_logo_url', 'brand_primary_color', 'brand_surface_dark'];
+
+async function getPublicBranding() {
+  return knex('business_settings').select(BRANDING_COLS).first();
+}
+
+module.exports = { getSettings, updateSettings, getPublicBranding };

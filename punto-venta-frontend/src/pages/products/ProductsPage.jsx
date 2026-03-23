@@ -42,7 +42,7 @@ function StockCell({ stock, minimo }) {
 function LoadingState() {
   return (
     <div className="flex flex-col items-center justify-center py-20">
-      <svg className="animate-spin w-8 h-8 text-indigo-500 mb-3" fill="none" viewBox="0 0 24 24">
+      <svg className="animate-spin w-8 h-8 text-[--brand] mb-3" fill="none" viewBox="0 0 24 24">
         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
       </svg>
@@ -81,7 +81,7 @@ function EmptyState({ hasFilters, onClearFilters, onAdd }) {
           </p>
           <button
             onClick={onClearFilters}
-            className="text-sm text-indigo-600 hover:text-indigo-800 font-medium transition-colors"
+            className="text-sm text-[--brand] hover:text-[--brand-active] font-medium transition-colors"
           >
             Limpiar filtros
           </button>
@@ -95,7 +95,7 @@ function EmptyState({ hasFilters, onClearFilters, onAdd }) {
           {onAdd && (
             <button
               onClick={onAdd}
-              className="flex items-center gap-1.5 text-sm text-indigo-600 hover:text-indigo-800 font-medium transition-colors"
+              className="flex items-center gap-1.5 text-sm text-[--brand] hover:text-[--brand-active] font-medium transition-colors"
             >
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
@@ -189,7 +189,7 @@ export function ProductsPage() {
         {canWrite && (
           <button
             onClick={openCreate}
-            className="flex items-center gap-2 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-xl shadow-sm transition-colors shrink-0"
+            className="btn-brand flex items-center gap-2 px-4 py-2.5 text-sm font-semibold rounded-xl shadow-sm shrink-0"
           >
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4">
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
@@ -214,7 +214,7 @@ export function ProductsPage() {
             placeholder="Buscar por nombre o SKU..."
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
-            className="w-full pl-9 pr-8 py-2 text-sm border border-gray-300 rounded-lg bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+            className="w-full pl-9 pr-8 py-2 text-sm border border-gray-300 rounded-lg bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[--brand] focus:border-transparent transition"
           />
           {searchInput && (
             <button
@@ -232,7 +232,7 @@ export function ProductsPage() {
         <select
           value={statusFilter}
           onChange={(e) => handleStatusChange(e.target.value)}
-          className="px-3 py-2 text-sm border border-gray-300 rounded-lg bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+          className="px-3 py-2 text-sm border border-gray-300 rounded-lg bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-[--brand] focus:border-transparent transition"
         >
           <option value="">Todos los estatus</option>
           <option value="ACTIVO">Activo</option>
@@ -326,7 +326,7 @@ export function ProductsPage() {
                           <button
                             onClick={() => openEdit(product)}
                             title="Editar producto"
-                            className="p-1.5 rounded-lg text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 transition-colors"
+                            className="p-1.5 rounded-lg text-gray-400 hover:text-[--brand] hover:bg-[--brand]/10 transition-colors"
                           >
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-4 h-4">
                               <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />

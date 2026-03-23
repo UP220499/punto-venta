@@ -28,7 +28,7 @@ function fmtDate(iso) {
 
 function IconSpinner() {
   return (
-    <svg className="animate-spin w-5 h-5 text-indigo-500" fill="none" viewBox="0 0 24 24">
+    <svg className="animate-spin w-5 h-5 text-[--brand]" fill="none" viewBox="0 0 24 24">
       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
     </svg>
@@ -99,7 +99,7 @@ function EmptyState({ hasFilters, onClearFilters }) {
         <button
           type="button"
           onClick={onClearFilters}
-          className="text-sm text-indigo-600 hover:text-indigo-800 font-medium transition-colors"
+          className="text-sm text-[--brand] hover:text-[--brand-active] font-medium transition-colors"
         >
           Limpiar filtros
         </button>
@@ -186,7 +186,7 @@ export function TicketsHistoryPage() {
             placeholder="Ej: 42"
             value={folioInput}
             onChange={(e) => setFolioInput(e.target.value)}
-            className="w-28 px-3 py-2 rounded-lg border border-gray-300 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+            className="w-28 px-3 py-2 rounded-lg border border-gray-300 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[--brand] focus:border-transparent transition"
           />
         </div>
 
@@ -195,7 +195,7 @@ export function TicketsHistoryPage() {
           <select
             value={estatusFilter}
             onChange={(e) => changeFilter(setEstatusFilter)(e.target.value)}
-            className="px-3 py-2 rounded-lg border border-gray-300 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+            className="px-3 py-2 rounded-lg border border-gray-300 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[--brand] focus:border-transparent transition"
           >
             <option value="">Todos</option>
             <option value="CERRADO">Cerrado</option>
@@ -209,7 +209,7 @@ export function TicketsHistoryPage() {
             type="date"
             value={fromDate}
             onChange={(e) => changeFilter(setFromDate)(e.target.value)}
-            className="px-3 py-2 rounded-lg border border-gray-300 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+            className="px-3 py-2 rounded-lg border border-gray-300 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[--brand] focus:border-transparent transition"
           />
         </div>
 
@@ -219,7 +219,7 @@ export function TicketsHistoryPage() {
             type="date"
             value={toDate}
             onChange={(e) => changeFilter(setToDate)(e.target.value)}
-            className="px-3 py-2 rounded-lg border border-gray-300 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+            className="px-3 py-2 rounded-lg border border-gray-300 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[--brand] focus:border-transparent transition"
           />
         </div>
 
@@ -292,7 +292,7 @@ export function TicketsHistoryPage() {
                         <button
                           type="button"
                           onClick={() => setSelectedTicketId(t.ticket_id)}
-                          className="text-indigo-600 hover:text-indigo-800 text-sm font-medium transition-colors"
+                          className="text-[--brand] hover:text-[--brand-active] text-sm font-medium transition-colors"
                         >
                           Ver detalle
                         </button>

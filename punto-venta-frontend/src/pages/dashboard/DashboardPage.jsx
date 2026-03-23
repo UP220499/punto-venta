@@ -391,7 +391,7 @@ export function DashboardPage() {
               </div>
               <Link
                 to="/audit"
-                className="block mt-4 text-center text-sm text-indigo-600 hover:text-indigo-800 font-medium transition-colors"
+                className="block mt-4 text-center text-sm text-[--brand] hover:text-[--brand-active] font-medium transition-colors"
               >
                 Ver todo →
               </Link>

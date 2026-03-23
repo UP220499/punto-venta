@@ -29,7 +29,7 @@ function AccessDenied() {
       </div>
       <Link
         to="/dashboard"
-        className="mt-2 px-4 py-2 rounded-lg bg-indigo-600 text-sm font-medium text-white hover:bg-indigo-700 transition-colors"
+        className="btn-brand mt-2 px-4 py-2 rounded-lg text-sm"
       >
         Ir al Dashboard
       </Link>

@@ -2,12 +2,28 @@
 
 const { parse, patchSettingsBody } = require('./settings.schemas');
 const service = require('./settings.service');
+const repo = require('./settings.repository');
 const { requirePermission } = require('../../shared/permissions');
 
+const BRANDING_DEFAULTS = {
+  business_name: 'Mi Negocio',
+  business_subtitle: null,
+  brand_logo_url: null,
+  brand_primary_color: null,
+  brand_surface_dark: null,
+};
+
 async function settingsRoutes(fastify) {
-  // Auth required – skip OPTIONS for CORS preflight
+  // Public endpoint — no auth required
+  fastify.get('/branding', async (request, reply) => {
+    const row = await repo.getPublicBranding();
+    return reply.send(row ?? BRANDING_DEFAULTS);
+  });
+
+  // Auth required – skip OPTIONS for CORS preflight and public /branding
   fastify.addHook('onRequest', async (request, reply) => {
     if (request.method === 'OPTIONS') return;
+    if (request.routeOptions?.url?.endsWith('/branding')) return;
     await fastify.authenticate(request, reply);
   });
 

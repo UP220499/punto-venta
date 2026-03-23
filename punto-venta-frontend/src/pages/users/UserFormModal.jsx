@@ -30,7 +30,7 @@ const editSchema = z.object({
 /* ── helpers ────────────────────────────────────────────── */
 
 function inputCls(hasError) {
-  return `w-full px-3.5 py-2.5 rounded-lg border text-sm bg-gray-50 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition ${
+  return `w-full px-3.5 py-2.5 rounded-lg border text-sm bg-gray-50 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[--brand] focus:border-transparent transition ${
     hasError ? 'border-red-400 bg-red-50' : 'border-gray-300'
   }`
 }
@@ -220,7 +220,7 @@ export function UserFormModal({ isOpen, user, onClose }) {
                       {...register('activo')}
                       className="sr-only peer"
                     />
-                    <div className="absolute inset-0 rounded-full bg-gray-200 transition-colors peer-checked:bg-indigo-600" />
+                    <div className="absolute inset-0 rounded-full bg-gray-200 transition-colors peer-checked:bg-[--brand]" />
                     <div className="absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow-sm transition-transform peer-checked:translate-x-4" />
                   </div>
                   <span className="text-sm text-gray-600 min-w-[4.5rem]">
@@ -246,13 +246,13 @@ export function UserFormModal({ isOpen, user, onClose }) {
                   {rolesData.map((role) => (
                     <label
                       key={role.code}
-                      className="flex items-center gap-3 p-3 rounded-lg border border-gray-200 hover:border-indigo-300 hover:bg-indigo-50/40 cursor-pointer transition-colors"
+                      className="flex items-center gap-3 p-3 rounded-lg border border-gray-200 hover:border-[--brand]/40 hover:bg-[--brand]/5 cursor-pointer transition-colors"
                     >
                       <input
                         type="checkbox"
                         checked={roleCodes.includes(role.code)}
                         onChange={() => toggleRole(role.code)}
-                        className="w-4 h-4 rounded text-indigo-600 border-gray-300 focus:ring-indigo-500"
+                        className="w-4 h-4 rounded text-[--brand] border-gray-300 focus:ring-[--brand]"
                       />
                       <div>
                         <p className="text-sm font-medium text-gray-800">{role.nombre}</p>
@@ -289,7 +289,7 @@ export function UserFormModal({ isOpen, user, onClose }) {
             <button
               type="submit"
               disabled={isPending}
-              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg transition-colors disabled:bg-indigo-400 disabled:cursor-not-allowed"
+              className="btn-brand flex items-center gap-2 px-4 py-2 text-sm rounded-lg"
             >
               {isPending && (
                 <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">

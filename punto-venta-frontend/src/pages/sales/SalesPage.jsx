@@ -72,12 +72,12 @@ function ProductCard({ product, qtyInCart, onAdd }) {
       className={`relative w-full text-left p-3 rounded-xl border transition-all group ${
         outOfStock || atMax
           ? 'border-gray-200 bg-gray-50 cursor-not-allowed opacity-60'
-          : 'border-gray-200 bg-white hover:border-indigo-300 hover:shadow-sm active:scale-[0.98] cursor-pointer'
+          : 'border-gray-200 bg-white hover:border-[--brand] hover:shadow-sm active:scale-[0.98] cursor-pointer'
       }`}
     >
       {/* Cart qty badge */}
       {qtyInCart > 0 && (
-        <span className="absolute top-2 right-2 min-w-[1.25rem] h-5 px-1 bg-indigo-600 text-white rounded-full text-xs flex items-center justify-center font-bold leading-none">
+        <span className="absolute top-2 right-2 min-w-[1.25rem] h-5 px-1 bg-[--brand] text-white rounded-full text-xs flex items-center justify-center font-bold leading-none">
           {qtyInCart}
         </span>
       )}
@@ -86,7 +86,7 @@ function ProductCard({ product, qtyInCart, onAdd }) {
       <p className="text-sm font-medium text-gray-900 leading-tight mb-2 line-clamp-2 min-h-[2.5rem]">
         {product.nombre}
       </p>
-      <p className="text-base font-bold text-indigo-600 mb-2 tabular-nums">{fmt(product.precio_venta)}</p>
+      <p className="text-base font-bold text-gray-900 mb-2 tabular-nums">{fmt(product.precio_venta)}</p>
 
       <div className="flex items-center justify-between">
         <span
@@ -105,7 +105,7 @@ function ProductCard({ product, qtyInCart, onAdd }) {
             className={`text-xs font-semibold px-2 py-0.5 rounded-full ${
               atMax
                 ? 'bg-gray-100 text-gray-400'
-                : 'bg-indigo-50 text-indigo-600 group-hover:bg-indigo-100'
+                : 'bg-[--brand]/10 text-[--brand] group-hover:bg-[--brand]/20'
             }`}
           >
             {atMax ? 'Máx.' : '+ Agregar'}
@@ -158,7 +158,7 @@ function ProductSearchPanel({ cartItems, stockAlert, onAdd }) {
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Buscar por nombre o SKU…"
             autoFocus
-            className="w-full pl-9 pr-4 py-2.5 rounded-lg border border-gray-300 bg-gray-50 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+            className="w-full pl-9 pr-4 py-2.5 rounded-lg border border-gray-300 bg-gray-50 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[--brand] focus:border-transparent transition"
           />
         </div>
       </div>
@@ -180,7 +180,7 @@ function ProductSearchPanel({ cartItems, stockAlert, onAdd }) {
       <div className="flex-1 overflow-y-auto px-4 py-3">
         {isLoading ? (
           <div className="flex items-center justify-center py-16">
-            <svg className="animate-spin w-7 h-7 text-indigo-400" fill="none" viewBox="0 0 24 24">
+            <svg className="animate-spin w-7 h-7 text-[--brand]" fill="none" viewBox="0 0 24 24">
               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
               <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
             </svg>
@@ -288,7 +288,7 @@ function TicketPanel({ items, subtotal, total, estimatedTax, taxEnabled, taxIncl
         <div className="flex items-center gap-2">
           <h3 className="text-sm font-semibold text-gray-900">Ticket actual</h3>
           {items.length > 0 && (
-            <span className="inline-flex items-center justify-center min-w-[1.25rem] h-5 px-1 bg-indigo-100 text-indigo-700 rounded-full text-xs font-bold">
+            <span className="inline-flex items-center justify-center min-w-[1.25rem] h-5 px-1 bg-[--brand]/15 text-[--brand] rounded-full text-xs font-bold">
               {items.length}
             </span>
           )}
@@ -356,7 +356,7 @@ function TicketPanel({ items, subtotal, total, estimatedTax, taxEnabled, taxIncl
           )}
           <div className="flex items-center justify-between pt-1.5 border-t border-gray-100">
             <span className="text-base font-bold text-gray-900">Total</span>
-            <span className="text-lg font-bold text-indigo-600 tabular-nums">{fmt(total)}</span>
+            <span className="text-lg font-bold text-gray-900 tabular-nums">{fmt(total)}</span>
           </div>
         </div>
 
@@ -367,7 +367,7 @@ function TicketPanel({ items, subtotal, total, estimatedTax, taxEnabled, taxIncl
               type="button"
               onClick={onCobrar}
               disabled={isEmpty}
-              className="w-full py-3 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white font-bold rounded-xl transition-colors disabled:opacity-40 disabled:cursor-not-allowed text-sm tracking-wide"
+              className="btn-brand w-full py-3 rounded-xl text-sm font-bold tracking-wide"
             >
               Cobrar · {fmt(total)}
             </button>

@@ -21,6 +21,13 @@ exports.seed = async function (knex) {
     .first();
 
   if (!settingsExist) {
-    await knex('business_settings').insert({ business_id: businessId });
+    await knex('business_settings').insert({
+      business_id: businessId,
+      business_name: 'El Potrillo',
+      business_subtitle: 'Internacional de Llantas',
+      brand_logo_url: '/branding/el-potrillo-logo.png',
+      brand_primary_color: '#A52222',
+      brand_surface_dark: '#111827',
+    });
   }
 };
