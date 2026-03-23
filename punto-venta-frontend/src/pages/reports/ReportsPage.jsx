@@ -81,7 +81,7 @@ function fmtDate(str) {
 
 /* ── icons ───────────────────────────────────────────── */
 
-function IconSpinner({ className = 'w-5 h-5 text-indigo-500' }) {
+function IconSpinner({ className = 'w-5 h-5 text-[--brand]' }) {
   return (
     <svg className={`animate-spin ${className}`} fill="none" viewBox="0 0 24 24">
       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
@@ -310,7 +310,7 @@ export function ReportsPage() {
                   onClick={() => applyPreset(p.key)}
                   className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                     activePreset === p.key
-                      ? 'bg-indigo-600 text-white'
+                      ? 'btn-brand'
                       : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                   }`}
                 >
@@ -326,7 +326,7 @@ export function ReportsPage() {
                 value={from}
                 max={to}
                 onChange={handleFrom}
-                className="text-sm border border-gray-300 rounded-lg px-3 py-1.5 bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                className="text-sm border border-gray-300 rounded-lg px-3 py-1.5 bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-[--brand] focus:border-transparent"
               />
               <span className="text-gray-400 text-sm">—</span>
               <input
@@ -334,7 +334,7 @@ export function ReportsPage() {
                 value={to}
                 min={from}
                 onChange={handleTo}
-                className="text-sm border border-gray-300 rounded-lg px-3 py-1.5 bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                className="text-sm border border-gray-300 rounded-lg px-3 py-1.5 bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-[--brand] focus:border-transparent"
               />
             </div>
           </div>

@@ -41,7 +41,7 @@ const editSchema = z.object({
 /* ── helpers ───────────────────────────────────────────── */
 
 function inputCls(hasError) {
-  return `w-full px-3.5 py-2.5 rounded-lg border text-sm bg-gray-50 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition ${
+  return `w-full px-3.5 py-2.5 rounded-lg border text-sm bg-gray-50 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[--brand] focus:border-transparent transition ${
     hasError ? 'border-red-400 bg-red-50' : 'border-gray-300'
   }`
 }
@@ -343,7 +343,7 @@ export function ProductFormModal({ isOpen, product, onClose }) {
             <button
               type="submit"
               disabled={isPending}
-              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg transition-colors disabled:bg-indigo-400 disabled:cursor-not-allowed"
+              className="btn-brand flex items-center gap-2 px-4 py-2 text-sm rounded-lg"
             >
               {isPending && (
                 <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">

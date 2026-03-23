@@ -1,5 +1,6 @@
 import { useLocation } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
+import { useBranding } from '../../lib/useBranding'
 
 const PAGE_TITLES = {
   '/dashboard': 'Dashboard',
@@ -18,6 +19,7 @@ const PAGE_TITLES = {
 export function Topbar() {
   const { user } = useAuth()
   const { pathname } = useLocation()
+  const { primaryColor } = useBranding()
   const pageTitle = PAGE_TITLES[pathname] ?? 'Panel'
   const initial = user?.username?.[0]?.toUpperCase() ?? 'U'
   const primaryRole = user?.roles?.[0] ?? null
@@ -33,7 +35,7 @@ export function Topbar() {
           </span>
         )}
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center shrink-0">
+          <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0" style={{ backgroundColor: primaryColor }}>
             <span className="text-white text-xs font-bold select-none">{initial}</span>
           </div>
           <span className="text-sm text-gray-700 font-medium hidden sm:block">

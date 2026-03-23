@@ -36,6 +36,12 @@ const patchSettingsBody = z
     default_stock_minimo:       z.number().int().min(0).optional(),
     default_unidad:             z.string().max(16).optional(),
     require_transfer_reference: z.boolean().optional(),
+    // Branding
+    business_name:       z.string().min(1).max(100).optional(),
+    business_subtitle:   z.string().max(200).nullable().optional(),
+    brand_logo_url:      z.string().max(500).nullable().optional(),
+    brand_primary_color: z.string().regex(/^#[0-9A-Fa-f]{6}$/).nullable().optional(),
+    brand_surface_dark:  z.string().regex(/^#[0-9A-Fa-f]{6}$/).nullable().optional(),
   })
   .strict(); // rejects any unknown key with a 400
 

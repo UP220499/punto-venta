@@ -71,7 +71,7 @@ function DeltaCell({ qty_delta }) {
 function LoadingState() {
   return (
     <div className="flex flex-col items-center justify-center py-20">
-      <svg className="animate-spin w-8 h-8 text-indigo-500 mb-3" fill="none" viewBox="0 0 24 24">
+      <svg className="animate-spin w-8 h-8 text-[--brand] mb-3" fill="none" viewBox="0 0 24 24">
         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
       </svg>
@@ -110,7 +110,7 @@ function EmptyState({ hasFilters, onClearFilters }) {
           </p>
           <button
             onClick={onClearFilters}
-            className="text-sm text-indigo-600 hover:text-indigo-800 font-medium transition-colors"
+            className="text-sm text-[--brand] hover:text-[--brand-active] font-medium transition-colors"
           >
             Limpiar filtros
           </button>
@@ -134,7 +134,7 @@ function FilterSelect({ value, onChange, className = '', children }) {
     <select
       value={value}
       onChange={(e) => onChange(e.target.value)}
-      className={`px-3 py-2 text-sm border border-gray-300 rounded-lg bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition ${className}`}
+      className={`px-3 py-2 text-sm border border-gray-300 rounded-lg bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-[--brand] focus:border-transparent transition ${className}`}
     >
       {children}
     </select>
@@ -240,7 +240,7 @@ export function InventoryPage() {
           <div className="flex items-center gap-2 shrink-0">
             <button
               onClick={openAdjustment}
-              className="flex items-center gap-2 px-4 py-2.5 bg-white hover:bg-gray-50 text-indigo-600 text-sm font-semibold rounded-xl border border-indigo-200 shadow-sm transition-colors"
+              className="flex items-center gap-2 px-4 py-2.5 bg-white hover:bg-[--brand]/10 text-[--brand] text-sm font-semibold rounded-xl border border-[--brand]/25 shadow-sm transition-colors"
             >
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
@@ -249,7 +249,7 @@ export function InventoryPage() {
             </button>
             <button
               onClick={openEntry}
-              className="flex items-center gap-2 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold rounded-xl shadow-sm transition-colors"
+              className="btn-brand flex items-center gap-2 px-4 py-2.5 text-sm rounded-xl shadow-sm"
             >
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
@@ -291,7 +291,7 @@ export function InventoryPage() {
             type="date"
             value={fromDate}
             onChange={(e) => changeFilter(setFromDate)(e.target.value)}
-            className="px-3 py-2 text-sm border border-gray-300 rounded-lg bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+            className="px-3 py-2 text-sm border border-gray-300 rounded-lg bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-[--brand] focus:border-transparent transition"
           />
         </div>
         <div className="flex items-center gap-2">
@@ -300,7 +300,7 @@ export function InventoryPage() {
             type="date"
             value={toDate}
             onChange={(e) => changeFilter(setToDate)(e.target.value)}
-            className="px-3 py-2 text-sm border border-gray-300 rounded-lg bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+            className="px-3 py-2 text-sm border border-gray-300 rounded-lg bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-[--brand] focus:border-transparent transition"
           />
         </div>
 

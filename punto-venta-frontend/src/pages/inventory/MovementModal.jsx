@@ -27,7 +27,7 @@ const adjustmentSchema = z.object({
 /* ── helpers ────────────────────────────────────────────── */
 
 function inputCls(hasError) {
-  return `w-full px-3.5 py-2.5 rounded-lg border text-sm bg-gray-50 text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition ${
+  return `w-full px-3.5 py-2.5 rounded-lg border text-sm bg-gray-50 text-gray-900 focus:outline-none focus:ring-2 focus:ring-[--brand] focus:border-transparent transition ${
     hasError ? 'border-red-400 bg-red-50' : 'border-gray-300'
   }`
 }
@@ -150,7 +150,7 @@ export function MovementModal({ isOpen, movementType = 'ENTRADA', products = [],
               {/* Color dot */}
               <span
                 className={`inline-block w-2 h-2 rounded-full shrink-0 ${
-                  isEntry ? 'bg-emerald-500' : 'bg-indigo-500'
+                  isEntry ? 'bg-emerald-500' : 'bg-[--brand]'
                 }`}
               />
               <h2 className="text-lg font-semibold text-gray-900">
@@ -315,10 +315,10 @@ export function MovementModal({ isOpen, movementType = 'ENTRADA', products = [],
             <button
               type="submit"
               disabled={isPending}
-              className={`flex items-center gap-2 px-4 py-2 text-sm font-medium text-white rounded-lg transition-colors disabled:cursor-not-allowed ${
+              className={`flex items-center gap-2 px-4 py-2 text-sm text-white rounded-lg transition-colors disabled:cursor-not-allowed ${
                 isEntry
                   ? 'bg-emerald-600 hover:bg-emerald-700 disabled:bg-emerald-400'
-                  : 'bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400'
+                  : 'btn-brand'
               }`}
             >
               {isPending && (

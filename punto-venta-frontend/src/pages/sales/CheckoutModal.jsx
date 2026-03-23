@@ -112,7 +112,7 @@ function SuccessScreen({ result, onClose }) {
         <button
           type="button"
           onClick={onClose}
-          className="w-full py-3 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white font-bold rounded-xl transition-colors text-sm tracking-wide"
+          className="btn-brand w-full py-3 rounded-xl text-sm font-bold tracking-wide"
         >
           Nueva venta
         </button>
@@ -184,9 +184,9 @@ function PaymentScreen({ total, isPending, serverError, onSubmit, onClose }) {
 
       <div className="flex-1 min-h-0 overflow-y-auto px-6 py-5 space-y-5">
         {/* Total to pay */}
-        <div className="text-center py-3 bg-indigo-50 rounded-xl border border-indigo-100">
-          <p className="text-xs font-semibold text-indigo-500 uppercase tracking-wider mb-1">Total a cobrar</p>
-          <p className="text-3xl font-bold text-indigo-700 tabular-nums">{fmt(total)}</p>
+        <div className="text-center py-3 bg-gray-50 rounded-xl border border-gray-200">
+          <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Total a cobrar</p>
+          <p className="text-3xl font-bold text-gray-900 tabular-nums">{fmt(total)}</p>
         </div>
 
         {/* Payment method */}
@@ -210,20 +210,20 @@ function PaymentScreen({ total, isPending, serverError, onSubmit, onClose }) {
                   onClick={() => setSelectedCode(m.code)}
                   className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl border-2 transition-all text-left ${
                     selectedCode === m.code
-                      ? 'border-indigo-500 bg-indigo-50'
+                      ? 'border-[--brand] bg-[--brand]/10'
                       : 'border-gray-200 bg-white hover:border-gray-300'
                   }`}
                 >
                   <span
                     className={`w-4 h-4 rounded-full border-2 shrink-0 flex items-center justify-center ${
-                      selectedCode === m.code ? 'border-indigo-500' : 'border-gray-300'
+                      selectedCode === m.code ? 'border-[--brand]' : 'border-gray-300'
                     }`}
                   >
                     {selectedCode === m.code && (
-                      <span className="w-2 h-2 rounded-full bg-indigo-500" />
+                      <span className="w-2 h-2 rounded-full bg-[--brand]" />
                     )}
                   </span>
-                  <span className={`text-sm font-medium ${selectedCode === m.code ? 'text-indigo-700' : 'text-gray-700'}`}>
+                  <span className={`text-sm font-medium ${selectedCode === m.code ? 'text-[--brand]' : 'text-gray-700'}`}>
                     {m.nombre_visible}
                   </span>
                 </button>
@@ -248,7 +248,7 @@ function PaymentScreen({ total, isPending, serverError, onSubmit, onClose }) {
               value={monto}
               onChange={(e) => setMonto(e.target.value)}
               placeholder={total.toFixed(2)}
-              className={`w-full pl-7 pr-4 py-2.5 rounded-lg border text-sm font-mono bg-gray-50 text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition ${
+              className={`w-full pl-7 pr-4 py-2.5 rounded-lg border text-sm font-mono bg-gray-50 text-gray-900 focus:outline-none focus:ring-2 focus:ring-[--brand] focus:border-transparent transition ${
                 monto !== '' && !montoSuficiente ? 'border-red-400 bg-red-50' : 'border-gray-300'
               }`}
             />
@@ -272,7 +272,7 @@ function PaymentScreen({ total, isPending, serverError, onSubmit, onClose }) {
               value={referencia}
               onChange={(e) => setReferencia(e.target.value)}
               placeholder="No. de transferencia, folio, etc."
-              className="w-full px-3.5 py-2.5 rounded-lg border border-gray-300 bg-gray-50 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+              className="w-full px-3.5 py-2.5 rounded-lg border border-gray-300 bg-gray-50 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-[--brand] focus:border-transparent transition"
             />
           </div>
         )}
@@ -310,7 +310,7 @@ function PaymentScreen({ total, isPending, serverError, onSubmit, onClose }) {
           type="button"
           onClick={handleSubmit}
           disabled={!canSubmit}
-          className="w-full py-3 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white font-bold rounded-xl transition-colors disabled:opacity-40 disabled:cursor-not-allowed text-sm tracking-wide flex items-center justify-center gap-2"
+          className="btn-brand w-full py-3 rounded-xl text-sm font-bold tracking-wide flex items-center justify-center gap-2"
         >
           {isPending ? (
             <>
